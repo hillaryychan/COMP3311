@@ -1,5 +1,22 @@
 # COMP3311 - Database Systems
 
+<!-- @import "[TOC]" {cmd="toc" depthFrom=2 depthTo=3 orderedList=false} -->
+
+<!-- code_chunk_output -->
+
+- [Overview](#overview)
+  - [Why Databases?](#why-databases)
+  - [What is Data? What is a Database?](#what-is-data-what-is-a-database)
+  - [Overview of the Database Field](#overview-of-the-database-field)
+  - [Database System Architecture](#database-system-architecture)
+- [Data Modelling and Database Design](#data-modelling-and-database-design)
+  - [Data Modelling](#data-modelling)
+  - [ER Modelling](#er-modelling)
+  - [Relational Modelling](#relational-modelling)
+- [Database Application Development](#database-application-development)
+
+<!-- /code_chunk_output -->
+
 ## Overview
 
 ### Why Databases?
