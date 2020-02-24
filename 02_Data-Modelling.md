@@ -132,7 +132,7 @@ A special case of inheritance is when an entity has **one subclass**; i.e "B _is
 
 ![specialisation subclass](imgs/1-49_ER-specialisation-subclass.png)
 
-#### Design Using the ER Model
+### Design Using the ER Model
 
 ER models are a simple, powerful set of data modelling tools. Some considerations to take when designing ER models:
 
@@ -222,12 +222,12 @@ e.g. `Class(...,Mon,2pm,Lyre)` is well-defined but `Class(...,NULL,2pm,Lyre,...)
 - **referential integrity constraints** require references to other tables to be valid. These references are known as **foreign keys**. A set of attributes F in R1 is a foreign key in R2 if:
     - the attributes in F correspond to the primary key of R2
     - the value of F in each tuple of R1 either occurs as a primary key in R2 or is entirely `NULL`
+
 Foreign keys are critical in relational databases because they provide:
     - the _glue_ that links individual relations (tables)
     - the way to assemble query answers from multiple tables
     - the relational representation of ER relationships
 
 ![referential integrity constraints](imgs/2-9_ref-integrity-constraint.png)
-
 
 
