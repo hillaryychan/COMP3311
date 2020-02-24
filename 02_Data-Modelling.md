@@ -106,7 +106,8 @@ In some cases, a relationship needs associated attributes
 
 #### Weak Entity Sets
 
-A **weak entity exists** only because of an association with strong entities; it cannot exist without the strong entities it is associated with. They do not have key of their own, but they do have a **descriminator** which is denoted using a dotted underline or the same symbol as a derived attributes
+A **weak entity** exists only because of an association with strong entities; it cannot exist without the strong entities it is associated with.  
+They do not have key of their own, but they do have a **descriminator** which is denoted using a dotted underline or the same symbol as a derived attributes. Weak entities are are always totally participant in a relationship.
 
 ![Weak entity](imgs/1-48_weak-entity.png)
 
@@ -152,7 +153,7 @@ The option you choose depends on how you want to represent your food.
 Will it have attributes such as its ingredients and other operations done on the attributes? Then the second option is better. Do we only want to the food name and nothing else? Then the first option is better.  
 Performance in this problem is not an issue as the operation in the end is _doable_ but perhaps not convenient, but this is not a design issue.
 
-## Relational Data Modelling
+## Relational Modelling
 
 The relational data model described the world as a collection of inter-connected _relations (or tables)_.  
 The goal of a relational model is to have a simple, general data modelling _formalism_ which maps easily to file structures (i.e. implementable)
@@ -220,8 +221,8 @@ e.g. `Student(id,...)` is guaranteed to be unique, `Class(...,day,time,location,
 - **entity integrity contraints** require keys to be fully-defined, that is no primary key value can be `NULL`  
 e.g. `Class(...,Mon,2pm,Lyre)` is well-defined but `Class(...,NULL,2pm,Lyre,...)` is not well-defined
 - **referential integrity constraints** require references to other tables to be valid. These references are known as **foreign keys**. A set of attributes F in R1 is a foreign key in R2 if:
-    - the attributes in F correspond to the primary key of R2
-    - the value of F in each tuple of R1 either occurs as a primary key in R2 or is entirely `NULL`
+  - the attributes in F correspond to the primary key of R2
+  - the value of F in each tuple of R1 either occurs as a primary key in R2 or is entirely `NULL`
 
 ![referential integrity constraints](imgs/2-9_ref-integrity-constraint.png)
 
@@ -264,51 +265,51 @@ Identifiers and reserved words are **case insensitive**; `TableName = tablename 
 Note: using double quotes `"` lets you make terms case-sensitive and name identifiers after reserved words.
 
 Sample sql file representing multiple ways to define a schema:
+
 ``` sql
 create domain CustNumType as
-	char(7) check (value ~ '[0-9]{7}');
+    char(7) check (value ~ '[0-9]{7}');
 
 create table Branch (
-	branchName  text,
-	address     text unique not null,
-	assets      integer check (assets > 100000),
-	primary key (branchName)
+    branchName  text,
+    address     text unique not null,
+    assets      integer check (assets > 100000),
+    primary key (branchName)
 );
 
 create table Account (
---	'A-101', 'B-502' ... not 'XXX-3' 'hello' 'xxA-101!!'
---	accountNo   char(5) check (accountNo ~ '[A-Z]-[0-9]{3}'),
-	accountNo   text check (accountNo ~ '^[A-Z]-[0-9]{3}$'),
-	branchName  text,
-	balance     integer check (balance >= 0),
---	Can you constrain that all branches have > $100000 in 
---	constraint  bigbalance check (sum(balance) > 100000), ???
-	primary key (accountNo),
-	foreign key (branchName) references Branch(branchName)
+--  'A-101', 'B-502' ... not 'XXX-3' 'hello' 'xxA-101!!'
+--  accountNo   char(5) check (accountNo ~ '[A-Z]-[0-9]{3}'),
+    accountNo   text check (accountNo ~ '^[A-Z]-[0-9]{3}$'),
+    branchName  text,
+    balance     integer check (balance >= 0),
+--  Can you constrain that all branches have > $100000 in
+--  constraint  bigbalance check (sum(balance) > 100000), ???
+    primary key (accountNo),
+    foreign key (branchName) references Branch(branchName)
 );
 
 create table Customer (
---	customerNo  char(7) check (customerNo ~ '[0-9]{7}'),
---	customerNo  integer check (customerNo::char(7) ~ '[0-9]{7}'), ???
---	customerNo  integer check (customerNo between 1000000 and 9999999),
-	customerNo  CustNumType,
-	name        text,
-	address     text,
---	homeBranch  foreign key references Branch(branchName), ???
---	homeBranch  text foreign key references Branch(branchName),
-	homeBranch  text,
-	primary key (customerNo),
-	foreign key (homeBranch) references Branch(branchName)
+--  customerNo  char(7) check (customerNo ~ '[0-9]{7}'),
+--  customerNo  integer check (customerNo::char(7) ~ '[0-9]{7}'), ???
+--  customerNo  integer check (customerNo between 1000000 and 9999999),
+    customerNo  CustNumType,
+    name        text,
+    address     text,
+--  homeBranch  foreign key references Branch(branchName), ???
+--  homeBranch  text foreign key references Branch(branchName),
+    homeBranch  text,
+    primary key (customerNo),
+    foreign key (homeBranch) references Branch(branchName)
 );
 
 create table HeldBy (
-	account     text,
-	customer    CustNumType,
-	primary key (account,customer),
-	foreign key (account) references Account(accountNo),
-	foreign key (customer) references Customer(customerNo)
+    account     text,
+    customer    CustNumType,
+    primary key (account,customer),
+    foreign key (account) references Account(accountNo),
+    foreign key (customer) references Customer(customerNo)
 );
 ```
 
 ## Mapping ER Designs to Relational Schemas
-
