@@ -223,11 +223,92 @@ e.g. `Class(...,Mon,2pm,Lyre)` is well-defined but `Class(...,NULL,2pm,Lyre,...)
     - the attributes in F correspond to the primary key of R2
     - the value of F in each tuple of R1 either occurs as a primary key in R2 or is entirely `NULL`
 
-Foreign keys are critical in relational databases because they provide:
-    - the _glue_ that links individual relations (tables)
-    - the way to assemble query answers from multiple tables
-    - the relational representation of ER relationships
-
 ![referential integrity constraints](imgs/2-9_ref-integrity-constraint.png)
 
+Foreign keys are critical in relational databases because they provide:
+
+- the _glue_ that links individual relations (tables)
+- the way to assemble query answers from multiple tables
+- the relational representation of ER relationships
+
+### Relational Databases
+
+A **relational database schema** is a set of relation schemas {R1,R2,...,Rn} and a set of integrity constraints.  
+A **relational database instance** is a set of relation instances {r1(R1), r2(R2),...,rn(Rn)} where all the integrity constraints are satisfied.  
+
+One of the important functions of a relational DBMS is to ensure that all data in the database satisfies constraints. Changes to the data fail if they violate constraints.
+
+We need a formalism, which is more detailed than boxes-and-arrows diagrams, to express relational schemas. SQL provides **Data Definition Language (DDL)** for this:
+
+``` sql
+CREATE TABLE TableName (
+    attrName1 domain1 constraints1,
+    attrName1 domain1 constraints1,
+    ...
+    PRIMARY KEY (attri,attrj,...)
+    FOREIGN KEY (attrx,attry,...) REFERENCES OtherTable(attrm,attrn)
+);
+```
+
+#### SQL Syntax in a Nutshell
+
+Everything after `--` is a **comment**  
+**Identifiers** are alphanumeric  
+**Reserved words** include `CREATE`, `SELECT`, `TABLE` etc.  
+**Strings** are in `'`: e.g. `'a string'`. There are no escape characters, but to escape `'` use it twice: `don''t ask`  
+**Numbers** are like `C` numbers; e.g. `1`, `-5`, `3.14159` etc.  
+Identifiers and reserved words are **case insensitive**; `TableName = tablename = TaBLeNamE != "TableName"`  
+**Types**: `integer`, `float`, `char(n)`, `varchar(n)`, `date`, etc.  
+**Operators**: `=`, `<>`, `<`, `<=`, `>`, `>=`, `AND`, `OR`, `NOT`, etc.
+
+Note: using double quotes `"` lets you make terms case-sensitive and name identifiers after reserved words.
+
+Sample sql file representing multiple ways to define a schema:
+``` sql
+create domain CustNumType as
+	char(7) check (value ~ '[0-9]{7}');
+
+create table Branch (
+	branchName  text,
+	address     text unique not null,
+	assets      integer check (assets > 100000),
+	primary key (branchName)
+);
+
+create table Account (
+--	'A-101', 'B-502' ... not 'XXX-3' 'hello' 'xxA-101!!'
+--	accountNo   char(5) check (accountNo ~ '[A-Z]-[0-9]{3}'),
+	accountNo   text check (accountNo ~ '^[A-Z]-[0-9]{3}$'),
+	branchName  text,
+	balance     integer check (balance >= 0),
+--	Can you constrain that all branches have > $100000 in 
+--	constraint  bigbalance check (sum(balance) > 100000), ???
+	primary key (accountNo),
+	foreign key (branchName) references Branch(branchName)
+);
+
+create table Customer (
+--	customerNo  char(7) check (customerNo ~ '[0-9]{7}'),
+--	customerNo  integer check (customerNo::char(7) ~ '[0-9]{7}'), ???
+--	customerNo  integer check (customerNo between 1000000 and 9999999),
+	customerNo  CustNumType,
+	name        text,
+	address     text,
+--	homeBranch  foreign key references Branch(branchName), ???
+--	homeBranch  text foreign key references Branch(branchName),
+	homeBranch  text,
+	primary key (customerNo),
+	foreign key (homeBranch) references Branch(branchName)
+);
+
+create table HeldBy (
+	account     text,
+	customer    CustNumType,
+	primary key (account,customer),
+	foreign key (account) references Account(accountNo),
+	foreign key (customer) references Customer(customerNo)
+);
+```
+
+## Mapping ER Designs to Relational Schemas
 
