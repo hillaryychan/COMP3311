@@ -167,8 +167,13 @@ The **cardinality** of a relationship is the # of associated entities on each si
 
 ![ER cardinality](imgs/1-44_ER-cardinality.png)
 
-The **participation** in a relation can be total or partial
+The **level of participation constraint** in a relation constrain can be defined as:  
+The participation in a relationship set **R** by and entity set **A** may be
 
+- **total** - every _a_∈_A_ participates in more than one relationship in **R**
+- **partial** - only some _a_∈_A_ participates in relationships in **R**
+
+E.g every bank loan is taken out by at least one customer, but not every customer has a bank loan
 ![ER participation](imgs/1-42_ER_participation.png)
 
 In some cases, a relationship needs associated attributes
@@ -223,7 +228,7 @@ The option you choose depends on how you want to represent your food.
 Will it have attributes such as its ingredients and other operations done on the attributes? Then the second option is better. Do we only want to the food name and nothing else? Then the first option is better.  
 Performance in this problem is not an issue as the operation in the end is _doable_ but perhaps not convenient, but this is not a design issue.
 
-### Relational Modelling
+### Relational Data Modelling
 
 The relational data model described the world as a collection of inter-connected _relations (or tables)_.  
 The goal of a relational model is to have a simple, general data modelling _formalism_ which maps easily to file structures (i.e. implementable)
@@ -245,13 +250,13 @@ Each relation (denoted R,S,T,...) has a:
 Each attribute (denoted A,B,... or a1,a2,...) has:
 
 - a **name** unique within a given **relation**
-- an associated domain, which is a set of allowed values
+- an associated domain, which is a set of allowed values (e.g. strings only, numbers, n-digits etc.)
 
 The database definition also uses _constraints_ (logic expressions)
 
 A tuple (row) is a set of values (attribute or column values). Attribute values:
 
-- are **atomic** (there are no composite or multi-valued attributes). Derived attributes do not need to be modelled in a relational model
+- are **atomic** (there are no composite or multi-valued attributes). Derived attributes do not need to be modelled in a relational model but can be
 - belong to a **domain**, which has a name, data type and format. A distinguished `NULL` value belongs to all domains. A `NULL` has several interpretations; none, don't know, irrelevant
 
 ![Eample tuple](imgs/1-60_example-tuple.png)
@@ -262,8 +267,38 @@ A **relation (table)** is a set of tuples. Since a relation is a set, there is *
 
 Each relation generally has a primary key (a subset of attributes, unique over the relation).
 
+A database is a set of relations (tables)
+
 #### Expressing a Relational Data Model Mathematically
 
 ![Mathematical representation of relational model](imgs/1-62_relation-math-model.png)
+
+Note: tuples (2,3) ≠ (3,2) but relation: {(a,b), (c,d)} = {(c,d), (a,b)}
+
+Examples of ER data models, a relation schema and relation instance
+
+![ER to schema to instance](imgs/2-4_er-schema-instance.jpg)
+
+#### Integrity Constraints
+
+To represent real-world problems, we need to describe:
+
+- what values are/aren't allowed
+- what combinations of values are/aren't allowed
+
+**Constraints** are logical statements that do this:
+
+- **domain constraints** limit the set of values that attributes can take  
+e.g. `Employee.age` attribute is typically defined as an `integer` often better modelled by having an extra constraint `15<age<66`
+Note that `NULL` satisfies all domain constraints except `NOT NULL`
+- **key constraints** identify attributes that uniquely identify tuples in a relation. A relation can have more than one key, so each key is a **candidate key**  
+e.g. `Student(id,...)` is guaranteed to be unique, `Class(...,day,time,location,...)` is unique
+- **entity integrity contraints** require keys to be fully-defined, that is no primary key value can be `NULL`  
+e.g. `Class(...,Mon,2pm,Lyre)` is well-defined but `Class(...,NULL,2pm,Lyre,...)` is not well-defined
+- **referential integrity constraints** require references to other tables to be valid. These references are known as **foreign keys**. A set of attributes F in R1 is a foreign key in R2 if:
+    - the attributes in F correspond to the primary key of R2
+    - the value of F in each tuple of R1 either occurs as a primary key in R2 or is entirely `NULL`
+
+![referential integrity constrains](imgs/2-9_ref-integrity-constraint.png)
 
 ## Database Application Development
