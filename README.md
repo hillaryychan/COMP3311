@@ -5,3 +5,4 @@
     1. [Data Modelling](https://github.com/hillaryychan/COMP3311/blob/master/02_Data-Modelling.md#Data-Modelling)
     2. [ER Modelling](https://github.com/hillaryychan/COMP3311/blob/master/02_Data-Modelling.md#ER-Modelling)
     3. [Relational Modelling](https://github.com/hillaryychan/COMP3311/blob/master/02_Data-Modelling.md#Relational-Modelling)
+    4. [Mapping ER Designs to Relational Schemas](https://github.com/hillaryychan/COMP3311/blob/master/02_Data-Modelling.md#Mapping-ER-Designs-to-Relational-Schemas)
