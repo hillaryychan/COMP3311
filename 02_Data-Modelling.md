@@ -356,7 +356,7 @@ Many-to-many relationships can be mapped to a new relation, where the primary ke
 
 ### Mapping 1:N Relationships
 
-A one-to-many relationship can be mapped by having more values in one entity or by mapping to a new relation.
+A one-to-many relationship can be mapped by having more values in one entity ~~or by mapping to a new relation.~~
 
 ![Map 1:N relationship](imgs/2-22_map-1n-rel.jpg)
 
@@ -364,7 +364,7 @@ A one-to-many relationship can be mapped by having more values in one entity or 
 
 For the first method, if we made branch store `customerNo` and `joined`, since each customer has one branch, the same branch will appear multiple times, violating the primary key.we cannot guarantee that we represented total participation on the customer entity.
 
-For the second method, when using a new relation to represent the relationship, we a are no longer able represent the cardinality of the relationship properly; the customer can have more than one branch (by appearing in multiple tuples) when it is only meant to have **one**
+The second method is incorrect because when using a new relation to represent the relationship, we a are no longer able represent the cardinality of the relationship properly; the customer can have more than one branch (by appearing in multiple tuples) when it is only meant to have **one**
 
 ### Mapping 1:1 Relationships
 
