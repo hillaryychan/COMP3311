@@ -25,7 +25,7 @@ select givenNames|' '||familyName from Actors where familyname="Zeta-Jones";
 
 -- Q6: What genres are there?
 
-select distinct genre from belongsIn;
+select distinct genre from belongsTo;
 -- Comedy
 -- War
 -- Action
@@ -49,14 +49,27 @@ select distinct genre from belongsIn;
 
 select Movies.title||' '||Movies.year
 from Movies, Directs, Directors 
-where Directors.familyName="Spielberg" and Directs.movie = Movies.id and Directs.director = Directors.id;
+where Directors.familyName="Spielberg"
+	and Directs.movie = Movies.id
+	and Directs.director = Directors.id;
+
+select m.title, m.year
+from   Movies m
+		join Directs s on (s.movie = m.id)
+		join Directors d on (s.director = d.id)
+where d.familyname = 'Spielberg';
 
 -- Q8: Which actor has acted in all movies (in this database)?
 
-
-
-
 -- Q9: Are there any directors in the database who don't direct any movies?
 
+create view nDirected as
+select d.id as director, count(s.movie) as ntimes
+from   Directors d
+		left outer join Directs s on (d.id = s.director)
+group  by d.id;
 
+select d.givennames||' '||d.familyname as name
+from   nDirected nd join Directors d on (nd.director = d.id)
+where  ntimes = 0;
 
