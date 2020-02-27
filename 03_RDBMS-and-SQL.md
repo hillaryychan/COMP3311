@@ -75,13 +75,10 @@ SQL statements used in `dumpfile`: `CREATE TABLE`, `ALTER TABLE`, `COPY`
 
 SQL statements for managing tables:
 
-* `CREATE TABLE table(attributes + constraints)`
-* `ALTER TABLE table tableSchemaChanges`
-* `DROP TABLE table(s) [CASCADE]`
-* `TRUNCATE TABLE table(s) [CASCADE]`
-
-`DROP ... CASCADE` also drops objects which depend on the table. Objects could be tuples, view but not whole table.  
-`TRUCATE ... CASCADE` truncates tables which refer to the table
+* `CREATE TABLE table(attributes + constraints)` creates a table containing specified columns and constraints for columns if specified
+* `ALTER TABLE table tableSchemaChanges` adds, deletes or modifies columns in an existing table
+* `DROP TABLE table(s) [CASCADE]` removes table definitions and all data. Using `CASCADE` also drops objects which depend on the table. Objects could be tuples, view but not whole table.  
+* `TRUNCATE TABLE table(s) [CASCADE]` removes **all rows** from a table. Using `CASCADE` will truncate tables which refer to the table
 
 ### Managing Tuples
 
@@ -117,17 +114,12 @@ Query languages are based on _relational algebra_
 
 ### Types/Constants in SQL
 
-Numeric types:
+Numeric types: `INTEGER`, `REAL`, `NUMERIC(w, d)`
+e.g. `10`, `-1`, `3.14159`, `2e-5`, `6.022e23`
 
-* `INTEGER`
-* `REAL`
-* `NUMERIC(w, d)`
-
-String types:
-
-* `CHAR(n)`
-* `VARCHAR(n)`
-* `TEXT`
+String types: `CHAR(n)`, `VARCHAR(n)`, `TEXT`
+e.g. `John`, `some text`, `!%#%!$`, `O''Brien`, `"`, `[A-Z]{4}\d{4}`, `a VeRy! Long String`  
+Note: the escape character in SQL is `'` hence the `''` in `O''Brien`
 
 PostgreSQL provides extended strings containing `\` escapes  
 e.g. `E'\n'`, `E'O\'Brien'`, `E'[A-Z]{4}\\d{4}'`, `E'John'`
@@ -137,12 +129,8 @@ Typecasting is also allowed via; `expr::type` e.g. `'10'::integer`
 Logical types: `BOOLEAN`, `TRUE` and `FALSE` (or `true` and `false`)  
 PostgreSQL also allows `t ``true`, `yes`, `f`, `false`, `no`
 
-Time related types:
-
-* `DATE`
-* `TIME`
-* `TIMESTAMP`
-* `INTERVAL`  
+Time related types: `DATE`, `TIME`, `TIMESTAMP`, `INTERVAL`
+e.g. `2008-04-13`, `13:30:15`, `2004-10-19 10:23:54`, `Wed Dec 17 07:37:16 1997 PST`, `10 minutes`, `5 days, 6 hours, 15 seconds`  
 Subtraction of timestamps results in an interval. e.g. `now()::TIMESTAMP - birthdate::TIMESTAMP`
 
 PostgreSQL also has a range of non-standard types such as  geometric (point/line/...), currency, IP addresses, JSON, XML, objectIDs, etc. Non-standard types typically use string literals (`'...'`) which need to be interpreted
