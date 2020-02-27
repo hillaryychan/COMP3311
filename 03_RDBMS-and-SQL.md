@@ -55,21 +55,25 @@ Under the home directory;
 
 ## Building and Maintaining Databases
 
-Shell commands to **create** and **remove** databases:
+### Managing Databases
+
+Shell commands to create and remove databases:
 
 * `creatdb <dbname>` creates a new empty database
-* `dropdb <dbname>` removes **all** data associated with a database
+* `dropdb <dbname>` removes all data associated with a database
 
 If no `dbname` is supplied, it assumes the database is called `$USER`
 
-Shell commands to **dump** and **restore** database contents:
+Shell commands to dump and restore database contents:
 
 * `pg_dump <dbname> > <dumpfile>` to dump the database in `dumpfile`
 * `psql <dbname> -f <dumpfile>` to restore the database from `dumpfile`
 
 SQL statements used in `dumpfile`: `CREATE TABLE`, `ALTER TABLE`, `COPY`
 
-SQL statements for **managing tables**:
+### Managing Tables
+
+SQL statements for managing tables:
 
 * `CREATE TABLE table(attributes + constraints)`
 * `ALTER TABLE table tableSchemaChanges`
@@ -79,20 +83,24 @@ SQL statements for **managing tables**:
 `DROP ... CASCADE` also drops objects which depend on the table. Objects could be tuples, view but not whole table.  
 `TRUCATE ... CASCADE` truncates tables which refer to the table
 
-SQL statements for **managing tuples**:
+### Managing Tuples
 
-* `INSERT INTO table (attrs) VALUES (tuple(s))` where `attrs=(attr1, attr2, ..., attrn)` and `tuple=(val1, val2, ..., valn)`
-* `DELETE FROM table WHERE conditions`
-* `UPDATE table SET attrValueChanges WHERE conditions` where `attrValueChanges` is a comma-separated list of `attrName=expression`
+SQL statements for managing tuples:
 
-Databases contain objects other than tables and tuples; views, functions, sequences, types. indexes, roles etc.  
+* `INSERT INTO tableName(col1, col2, ...) VALUES (col1_val1, col2_val1)[,(col1_val2, col2_val2), ...];`  
+Note that you can insert multiple rows for the same columns
+* `DELETE FROM tableName WHERE conditions;`
+* `UPDATE tableName SET attrValueChanges WHERE conditions;` where `attrValueChanges` is a comma-separated list of `attrName=expression`
+
+### Managing Objects
+
+Databases contain objects other than tables and tuples; views, functions, sequences, types, indexes, roles etc.  
 Most have SQL statements for:
 
 * `CREATE ObjectType name ...`
 * `DROP ObjectType name ...`
 
-Views and functions also have available:  
-`CREATE OR REPLACE ObjectType name ...`
+Views and functions also have available `CREATE OR REPLACE ObjectType name ...`
 
 ## SQL
 
