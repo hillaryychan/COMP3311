@@ -435,6 +435,6 @@ Which mapping is best depends on how the data is used
 
 The different mappings also capture different aspects of subclasses:
 
-* ER styles can't show disjoint subclasses and total participation
-* OO styles can't show disjoint subclasses but can show total participation
-* single table styles can show disjointed and overlapping subclasses and total participation if we define constraints properly
+* ER styles can't show disjoint subclasses and total participation. We can't guarantee a objects does not appear in another subclass.
+* OO styles can't show disjoint subclasses but can show total participation. We can't guarantee a objects does not appear in another subclass.
+* single table styles can show disjointed and overlapping subclasses and total participation if we define constraints properly. E.g. we have an attribute indicate which subclass an object belongs to. However we can't prevent a tuple from having a attribute from another subclass

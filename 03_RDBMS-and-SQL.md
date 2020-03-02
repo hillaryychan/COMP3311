@@ -200,8 +200,11 @@ name ~ '^Ja'        name beginning with 'Ja'
 name ~ '^.i'        name has 'i' as the second letter
 name ~ '.*o.*o.*'   name contains two 'o's
 name ~ 'ith$'       name ends with 'ith'
-name ~ 'John'       name equals 'John'
+name ~ 'John'       name contains 'John'
 ```
+
+Note: in terms of speed, logical operators (`=`, etc.) are faster than `LIKE` followed by regex pattern matching.  
+regex is not part of the SQL standard however it is widely supported.
 
 **String manipulation**:
 
@@ -209,8 +212,11 @@ name ~ 'John'       name equals 'John'
 * `lower(str)` returns the lowercase version of `str`
 * `substring(str, start, count)` extracts a substring from `str`
 
-Note that the above operations are null-preserving (strict). If any operand is `NULL` the result is `NULL`.  
+Note the following:
+
+* the above operations are null-preserving (strict). If any operand is `NULL` the result is `NULL`  
 Beware of `<a>||' '||<b>`. It is null if either `a` or `b` is `NULL`
+* SQL indexes start from `1` instead of `0`
 
 **Arithmetic operators**:
 `+`, `-`, `*`, `/`, `abs`, `ceil`, `floor`, `power`, `sqrt`, `sin`, etc  
