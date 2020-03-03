@@ -443,20 +443,72 @@ Find the queries that can be used to answer the following questions on the beer 
 
 ``` sql
 -- 1. What beers are made by Toohey's?
+
+select * from Beers where manf = 'Toohey''s';
+
 -- 2. Show beers with headings "Beer" and "Brewer"
+
+slect name as "Beer", manf as "Brewer" from Beers;
+
 -- 3. How many different beers are there?
+
+-- since name is the primary key for Beers, we know the beer names are unique
+select count(name) from Beers;
+
 -- 4. How many different brewers are there?
+
+-- since brewers are not unique we need the 'distinct' keyword
+select count(distinct manf) from Beers;
+
 -- 5. (a) Which beers does John like?
+
+-- the drinkers name is used as a foreign key so find beers in Likes which have 'John'
+select beer from Likes where drinker = 'John';
+
 -- 5. (b) Find the brewers whose beer John likes
+
+-- approach 1: join Likes with Beer and filter
+select distinct b.manf
+from Beers b join Likes l on l.beer = b.name 
+where l.drinker = 'John';
+
+-- approach 2: use the previous query to get a set of beers
+select distinct manf
+from Beers
+where name in (select beer from Likes where drinker = 'John');
+
+
 -- 6. Find pairs of beers by the same manufacturer
+
+
 -- 7. (a) How many beers does each brewer make?
+
+
 -- 7. (b) Which brewers make only one beer?
+
+
 -- 7. (c) Find beers that are the only one made by their brewer
+
+
 -- 8. Find beers sold at bars where John drinks
+
+
 -- 9. Which brewer makes the most beers?
+
+
 -- 10. Bars where either Gernot or John drinks
+
+
 -- 11. Bars where both Gernot and John drinks
+
+
 -- 12. Find bars that server New at the same price as the Coogee Bay Hotel charges for VB
+
+
 -- 13. Find the average price of common beers (i.e. served in more than two hotels)
+
+
 -- 14. Which bar sells 'New' cheapest 
+
+
 ```
