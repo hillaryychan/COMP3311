@@ -148,6 +148,9 @@ CREATE TYPE Name as (AttrName AttrType, ...);
 CREATE TYPE Name as ENUM ('Label', ...);
 ```
 
+Values in enumerated (enum) types are ordered according to order of insertion so, 'small' < 'medium' < 'large'  
+Values in domain stypes are ordered as for the underlying data type so, 'large' < 'medium' < 'small'
+
 ### Tuple and Set Literals
 
 Tuples and set constants are both written as `(val1, val2, val3, ...)`  
@@ -229,8 +232,232 @@ _Aggregations_ "summarise" a column of numbers in a relations:
 
 ### The `NULL` Value
 
+Expressions containing `NULL` generally yield `NULL`  
+However, boolean expressions use three-valued logic:
+
+| a       | b       | a AND b | a OR b  |
+| :---:   | :---:   | :---:   | :---:   |
+| `TRUE`  | `TRUE`  | `TRUE`  | `TRUE`  |
+| `TRUE`  | `FALSE` | `FALSE` | `TRUE`  |
+| `TRUE`  | `NULL`  | `NULL`  | `TRUE`  |
+| `FALSE` | `FALSE` | `FALSE` | `FALSE` |
+| `FALSE` | `NULL`  | `FALSE` | `NULL`  |
+| `NULL`  | `NULL`  | `NULL`  | `NULL`  |
+
+An important consequence of `NULL` behaviour is that the following expressions do not work as expected:  `x = NULL` and `x <> NULL`. Both return `NULL` regardless of the value of `x`. You can only test for `NULL` using `x IS NULL` and `x IS NOT NULL`
+
 ### Conditional Expressions
+
+SQL provides other ways for dealing with `NULL`:
+
+* `coalesce(val1, val2, ..., valn)` returns the first non-null value `vali`. It is useful for providing a "displayable" value for nulls.  
+e.g. `select coalesce(mark, '??') from Marks ...;`
+* `nullif(val1, val2)` returns `NULL` if `val1` is equal to `val2` and can be used to implement an inverse `coalesce`  
+e.g.`nullif(mark, '??')`
+
+SQL also provides generalised conditional expressions:
+
+``` sql
+CASE
+    WHEN test1 THEN result1
+    WHEN test2 THEN result2
+    ...
+    ELSE resultn
+END
+
+-- example
+CASE
+    WHEN mark >= 85 then 'HD'
+    ...
+    ELSE '??'
+END
+```
+
+Tests that yield `NULL` are treated as `FALSE` If there is no `ELSE` and all test cases fail, `CASE` yields `NULL`
 
 ### SQL Queries
 
+An SQL query consists of a sequence of clauses:
+
+``` sql
+SELECT      projectionList
+FROM        relations/joins
+WHERE       condition(s)
+GROUP BY    groupingAttributes
+HAVING      groupCondition;
+
+-- FROM, WHERE, GROUP BY, HAVING clauses are optional
+```
+
+The result of a query is a relations, typically displayed as table. Results can be just one tuple with one attribute (i.e. one value) or even empty.
+
+Example:
+``` sql
+-- Given the following schema:
+Students(id, name, ...)
+Enrolments(student, course, mark, grade)
+
+-- Example SQL query:
+SELECT      s.id, s.name, avg(e.mark) as avgMark
+FROM        Students s, Enrolments e
+WHERE       s.id = e.student
+GROUP BY    s.id, s.name;
+-- or --
+SELECT      s.id, s.name, avg(e.mark) as avgMark
+FROM        Students s
+JOIN        Enrolments e on (s.id = e.student)
+GROUP BY    s.id, s.name;
+```
+
+The query computes the following:
+
+* produces all pairs of Students, Enrolments tuples which satisfy the condition `Students.id = Enrolments.student`
+* each tuple has `(id, name, ..., student, course, mark, grade)`
+* form groups of tuples with the same `(id, name)` values
+* for each group, compute the average mark
+* form result tuples `(id, name, avgMark)`
+
+#### Joins
+
+The general join structure:
+``` sql
+SELECT col1, t1.name, t2.name, colB
+FROM table1 as t1
+____ JOIN table2 as t2
+ON t1.id = t2.id                    -- specify how to join tables
+WHERE conditions
+ORDER BY value;
+```
+
+Types of join
+
+* INNER - only return connected rows when there is a matching join
+* RIGHT OUTER -will return **every** row from the right table even if there is no matching row
+* LEFT OUTER - will return **every** row from the left table even if there is no matching row
+* FULL OUTER - return **every** row from the left and right table. When the rows match they are connected, when they don't match they are still included with nulls in the non-matching columns
+
+* CROSS - performs a cross product between two tables; connects each row from the first table with each row from the second table.
+
+It is possible to join a table with itself using the joins above. This is known as a **self join**.
+
+Example:
+
+``` sql
+-- Given this small database:
+create table R (
+	x  integer primary key,
+	y  text
+);
+
+insert into R values (1,'abc');
+insert into R values (2,'def');
+insert into R values (3,'ghi');
+
+create table S (
+	z  char(1) primary key,
+	x  integer references R(x)
+);
+
+insert into S values ('a',1);
+insert into S values ('b',3);
+insert into S values ('c',1);
+insert into S values ('d',null);
+
+-- select * from R natural join S;
+x	y	z
+1	abc	a
+1	abc	c
+3	ghi	b
+
+-- select * from R join S on (R.x = S.x);  -- join means inner join (inner is optional and is the default)
+x	y	z	x
+1	abc	a	1
+1	abc	c	1
+3	ghi	b	3
+
+-- select * from R, S where R.x = S.x;
+x	y	z	x
+1	abc	a	1
+1	abc	c	1
+3	ghi	b	3
+
+-- select * from R left outer join S on (R.x = S.x);  -- outer not compulsory when left, right, and full are used
+x	y	z	x
+1	abc	a	1
+1	abc	c	1
+2	def	
+3	ghi	b	3
+
+-- select * from R right outer join S on (R.x = S.x);
+x	y	z	x
+1	abc	a	1
+1	abc	c	1
+3	ghi	b	3
+		d	
+
+-- select * from R full outer join S on (R.x = S.x);
+x	y	z	x
+1	abc	a	1
+1	abc	c	1
+2	def	
+3	ghi	b	3
+		d
+```
+
+#### Problem-solving in SQL
+
+**Aim**: starting with an informal request (i.e. an informal description of the information required from the database) we end up with a list of tuples that the requirements in the request.  
+**Pre-requisite**: know your schema
+
+Look for keywords in the request to identify required data. e.g:
+
+* tell me the _names_ of all **students**...
+* _how many_ **students** failed...
+* what is the _highest mark_ in
+* which **courses** are ... (course code?)
+
+When developing SQL queries:
+
+* relate required data to **attributes** in the schema
+* identify which **tables** contain these attributes
+* combine data from relevant tables (`FROM` , `JOIN`)
+* specify conditions to select relevant data (`WHERE`)
+* [optional] define grouping attributes (`GROUP BY`)
+* develop expressions to compute output values (`SELECT`)
+
 ### Views
+
+A **view** associates a name with a query via  
+`CREATE VIEW viewName [(attributes)] AS query;`
+
+Each time the view is invokes (in a `FROM` clause) the query is evaluated, yielding a set of tuples and the set of tuples is used as the values of the view.
+
+A view can be treated as a  **virtual table**. They are useful for "packaging" a complex query to use in other queries.
+
+An example covering most SQL topics:
+
+We have the ER design for a beer database and its corresponding relational model:
+
+![beer databse](imgs/3-42_beer-database.jpg)
+
+Find the queries that can be used to answer the following questions on the beer database:
+
+``` sql
+-- 1. What beers are made by Toohey's?
+-- 2. Show beers with headings "Beer" and "Brewer"
+-- 3. How many different beers are there?
+-- 4. How many different brewers are there?
+-- 5. (a) Which beers does John like?
+-- 5. (b) Find the brewers whose beer John likes
+-- 6. Find pairs of beers by the same manufacturer
+-- 7. (a) How many beers does each brewer make?
+-- 7. (b) Which brewers make only one beer?
+-- 7. (c) Find beers that are the only one made by their brewer
+-- 8. Find beers sold at bars where John drinks
+-- 9. Which brewer makes the most beers?
+-- 10. Bars where either Gernot or John drinks
+-- 11. Bars where both Gernot and John drinks
+-- 12. Find bars that server New at the same price as the Coogee Bay Hotel charges for VB
+-- 13. Find the average price of common beers (i.e. served in more than two hotels)
+-- 14. Which bar sells 'New' cheapest 
+```
