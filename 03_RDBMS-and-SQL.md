@@ -324,18 +324,17 @@ The general join structure:
 SELECT col1, t1.name, t2.name, colB
 FROM table1 as t1
 ____ JOIN table2 as t2
-ON t1.id = t2.id                    -- specify how to join tables
+ON t1.id = t2.id -- specify how to join tables
 WHERE conditions
 ORDER BY value;
 ```
 
-Types of join
+Types of joins
 
 * INNER - only return connected rows when there is a matching join
 * RIGHT OUTER -will return **every** row from the right table even if there is no matching row
 * LEFT OUTER - will return **every** row from the left table even if there is no matching row
 * FULL OUTER - return **every** row from the left and right table. When the rows match they are connected, when they don't match they are still included with nulls in the non-matching columns
-
 * CROSS - performs a cross product between two tables; connects each row from the first table with each row from the second table.
 
 It is possible to join a table with itself using the joins above. This is known as a **self join**.
