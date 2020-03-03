@@ -332,7 +332,7 @@ ORDER BY value;
 Types of joins
 
 * INNER - only return connected rows when there is a matching join
-* RIGHT OUTER -will return **every** row from the right table even if there is no matching row
+* RIGHT OUTER - will return **every** row from the right table even if there is no matching row
 * LEFT OUTER - will return **every** row from the left table even if there is no matching row
 * FULL OUTER - return **every** row from the left and right table. When the rows match they are connected, when they don't match they are still included with nulls in the non-matching columns
 * CROSS - performs a cross product between two tables; connects each row from the first table with each row from the second table.
