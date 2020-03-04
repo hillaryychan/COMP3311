@@ -619,10 +619,42 @@ from Sells
 where beer = 'New' and price = (select min(price) from Sells where beer = 'New');
 
 -- 15. Which bar is the most popular? (most drinkers)
--- 16.
--- 17.
--- 18.
--- 19.
--- 20.
--- 21.
+
+create view Popularity(bar, ndrinkers) as
+select bar, count(drinker)
+from Frequents
+group by bar;
+
+select bar
+from Popularity
+where ndrinkers = (select max(ndrinkers) from Popularity);
+
+-- 16. Which bar is most expensive (Maximum average price)
+-- 17. Which beers are sold at all bars?
+-- 18. Price of cheapest beer at each bar?
+-- 19. Name of cheapest beer at each bar?
+-- 20. How many drinkers are in each suburb?
+-- 21. How many bars in suburbs where drinkers live? (Must include suburbs with no bars)
 ```
+
+## Extending SQL
+
+What we have seen of SQL so far:
+
+* data definition language (`create table()`)
+* constraints (domain, key, referential integrity)
+* query language (`select...from...where...`)
+* views (give names to SQL queries)
+
+This is not sufficient tto write complete applications. More _extensibility_ and _programmability_ are needed.
+
+Standard SQL may be extended via the following:
+
+* new data types (including constraints, I/O, indexes, etc.)
+* object-orientation
+* more powerful constraint checking
+* packaging/parameterising queries
+* more functions/aggregates for use in queries
+* event-based triggered actions
+
+All are required to assist in application development.
