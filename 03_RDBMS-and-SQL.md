@@ -433,6 +433,30 @@ Each time the view is invokes (in a `FROM` clause) the query is evaluated, yield
 
 A view can be treated as a  **virtual table**. They are useful for "packaging" a complex query to use in other queries.
 
+Views can be defined by giving names to attributes
+
+``` sql
+create view V(a,b,c) as
+select x, y, x from R where Condiion;
+-- is the same as
+create view V as
+select x as a, y as b, z as c
+from R where Condition;
+```
+
+Views can be redefined using `create or replace view V(a,b,c) as Query from R where condition;`  
+Restrictions:
+
+* the new view must have the same number of attributes as the old view
+* attributes in the new view must be the same type as the old view
+
+Otherwise:
+
+``` sql
+drop view V;
+create view V(a,b,c) as Query;
+```
+
 An example covering most SQL topics:
 
 We have the ER design for a beer database and its corresponding relational model:
@@ -468,47 +492,137 @@ select beer from Likes where drinker = 'John';
 -- 5. (b) Find the brewers whose beer John likes
 
 -- approach 1: join Likes with Beer and filter
+-- note: manufacturers are distinct because John may like beers made by the same brewer
 select distinct b.manf
 from Beers b join Likes l on l.beer = b.name 
 where l.drinker = 'John';
 
 -- approach 2: use the previous query to get a set of beers
+-- this approach is slower than using JOINS because for each beer in Beers 
+-- we need to check if it is in John's favourite beers
 select distinct manf
 from Beers
 where name in (select beer from Likes where drinker = 'John');
 
+-- note: JOINS are preferred over nested queries
 
 -- 6. Find pairs of beers by the same manufacturer
 
+-- use a self join
+-- using b1.name < b2.name keeps results in (A,B) avoiding (A,A) and (B,A)
+select b1.name, b2.name
+from Beers b1 join Beers b2 on (b1.manf = b2.manf)
+where b1.name < b2.name;
 
 -- 7. (a) How many beers does each brewer make?
 
+select manf as brewer, count(name) as nbeers
+from Beers
+group by manf;
 
 -- 7. (b) Which brewers make only one beer?
 
+create or replace view nb(brewer, nbeers) as
+select manf, count(name)
+from Beers
+group by manf;
+
+select brewer from nb where nbeers = 1;
 
 -- 7. (c) Find beers that are the only one made by their brewer
 
+select b.beer
+from Beers b join nb on (nb.brewer = b.manf)
+where nb.nbeers = 1;
 
 -- 8. Find beers sold at bars where John drinks
 
+select distinct s.beer
+from Frequents f join Sells s on (f.bar = s.bar)
+where f.drinker = 'John';
+
+-- alternative solution using nested queries
+select beer
+from   Sells
+where  bar in (select bar from frequents where drinker='John');
 
 -- 9. Which brewer makes the most beers?
 
+create view BrewerBeers(brewer, nbeers) as
+select manf, count(name)
+from Beers
+group by manf;
+
+select brewer
+from BrewerBeers
+where nbeers = (select max(nbeers) from BrewerBeers);
 
 -- 10. Bars where either Gernot or John drinks
 
+select distinct bar from Frequents where drinker = 'Gernot' or drinker ='John';
+-- or
+select distinct bar from Frequents where drinker in ('Gernot', 'John');
+-- or
+(select bar from frequents where drinker='Gernot')
+union
+(select bar from frequents where drinker='John');
 
 -- 11. Bars where both Gernot and John drinks
 
+-- WRONG: select bar from frequents where drinker='Gernot' and drinker='John';
+
+-- using intersect
+(select bar from Frequents where drinkers = 'Gernot')
+intersect
+(select bar from Frequents where drinkers = 'John');
+
+-- using joins
+select d1.bar, d1.drinker, d2.drinker
+from Frequents d1 join Frequents d2 on (d1.bar = d2.bar)
+where d1.drinker = 'Gernot' and d2.drinker = 'John';
 
 -- 12. Find bars that server New at the same price as the Coogee Bay Hotel charges for VB
 
+-- find the price that CBH charges for VB
+crete or replace view CBH_VB_price as
+select price
+from Sells
+where bar = 'Coogee Bay Hotel' and beer = 'Victoria Bitter';
+
+select bar
+from Sells
+where price = (select price from CBH_VB_price) and bar <> 'Coogee Bay Hotel';
 
 -- 13. Find the average price of common beers (i.e. served in more than two hotels)
 
+-- create a view of common beers
+create or replace view CommonBeers as
+select beer
+from Sells
+group by beer
+having count(bar) > 2;
+
+-- then use avg() to determine the average price per beer
+select beer, avg(price)::numeric(5,2) as "AvgPrice"
+from Sells
+where beer in (select * from CommonBeers)
+group by beer;
 
 -- 14. Which bar sells 'New' cheapest 
 
+-- find cheapest price New is sold for
+select min(price) from Sells where beer = 'New';
 
+-- then find the Sells record that has the price
+select bar
+from Sells
+where beer = 'New' and price = (select min(price) from Sells where beer = 'New');
+
+-- 15. Which bar is the most popular? (most drinkers)
+-- 16.
+-- 17.
+-- 18.
+-- 19.
+-- 20.
+-- 21.
 ```
