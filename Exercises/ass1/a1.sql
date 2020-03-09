@@ -15,16 +15,25 @@ select i.id, i.brand, p.pno, c.coid, r.rate
 from insured_item i, policy p, coverage c, rating_record r
 where i.id=p.id and p.pno=c.pno and r.coid=c.coid;
 
-create or replace view max_rate as
-select brand, max(rate)
-from item_rate
-group by brand;
-
 create or replace view Q2(brand, car_id, pno, premium) as
 select i.brand, i.id, i.pno, i.rate
-from item_rate i, max_rate r
-where r.max=i.rate and r.brand=i.brand
-order by i.brand, i.id, i.pno;
+from item_rate i 
+where i.rate >= all(
+    select i2.rate 
+    from item_rate i2 
+    where i2.brand=i.brand
+) order by i.brand, i.id, i.pno;
+
+-- create or replace view max_rate as
+-- select brand, max(rate)
+-- from item_rate
+-- group by brand;
+-- 
+-- create or replace view Q2(brand, car_id, pno, premium) as
+-- select i.brand, i.id, i.pno, i.rate
+-- from item_rate i, max_rate r
+-- where r.max=i.rate and r.brand=i.brand
+-- order by i.brand, i.id, i.pno;
 
 -- Q3. List all the staff members who did not sell any policies in the last 365 calendar days (from today). Note that policy.sid records the staff who sold this policy, underwritten_by.wdate records the date a policy is sold (we ignore the status here). Order the result by pid in ascending order.
 
