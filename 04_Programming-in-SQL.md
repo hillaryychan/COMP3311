@@ -147,7 +147,8 @@ Lord Nelson     | The Rocks | 123888
 A parameterless function behaves similar to a view
 
 Let us compare a view and function which do the same thing
-```
+
+``` sql
 create or replace view EmpList(name, addr) as
 select family||' '||given, street||', '||town, from Employees;
 
