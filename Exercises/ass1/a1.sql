@@ -17,23 +17,12 @@ where i.id=p.id and p.pno=c.pno and r.coid=c.coid;
 
 create or replace view Q2(brand, car_id, pno, premium) as
 select i.brand, i.id, i.pno, i.rate
-from item_rate i 
+from item_rate i
 where i.rate >= all(
-    select i2.rate 
-    from item_rate i2 
+    select i2.rate
+    from item_rate i2
     where i2.brand=i.brand
 ) order by i.brand, i.id, i.pno;
-
--- create or replace view max_rate as
--- select brand, max(rate)
--- from item_rate
--- group by brand;
--- 
--- create or replace view Q2(brand, car_id, pno, premium) as
--- select i.brand, i.id, i.pno, i.rate
--- from item_rate i, max_rate r
--- where r.max=i.rate and r.brand=i.brand
--- order by i.brand, i.id, i.pno;
 
 -- Q3. List all the staff members who did not sell any policies in the last 365 calendar days (from today). Note that policy.sid records the staff who sold this policy, underwritten_by.wdate records the date a policy is sold (we ignore the status here). Order the result by pid in ascending order.
 
@@ -109,10 +98,31 @@ where p.pid in (
 
 -- Q8. For each policy X, compute the number of other policies (excluding X) whose coverage is contained by the coverage of X. For example, if a policy X has 3 coverages (identified by cname), say {C1, C2, C3}, and another policy Y has 2 coverages, {C1, C3}, we say Y's coverage is contained by X's. In case if X's and Y's coverages are identical, their coverages are contained by each other. Order the result by pno in ascending order.
 
---create or replace view Q8(pno, npolicies) as ...
+create or replace view policy_coverage as 
+select p.pno, c2.coid, c1.cname 
+from policy p, coverage c1, coverage c2 
+where p.pno=c1.pno and c1.cname=c2.cname;
+
+create or replace view Q8(pno, npolicies) as
+select p1.pno, count(p2.pno) 
+from policy p1, policy p2 
+where not exists (
+    select pc2.coid from policy_coverage pc2 where pc2.pno=p2.pno
+    except
+    select pc1.coid from policy_coverage pc1 where pc1.pno=p1.pno)
+    and p1.pno<>p2.pno 
+group by p1.pno order by p1.pno;
 
 -- Q9. Create a stored function that increases/decreases the rate by Adj% for all active (as of today) and enforced (with status E) policies. Other policies shall not be affected. Adj is an integer between -99 and 99. For example, if the original rate is 200 and Adj is -20, the new rate will be 160. If the original rate is 300 and Adj is 10, the new rate will be 330. The function returns the number of policies that have been adjusted.
 
---create or replace function ratechange(Adj integer) returns integer ...
+-- what does it mean by 'active (as of today)'
+create or replace function ratechange(Adj integer) returns integer
+--as $$
+--declare
+---- variables
+--begin
+--    select r.rate from policy p, coverage c, rating_record r where p.pno=c.pno and r.coid=c.coid and p.status='E';
+--end;
+--$$ language plpgsql;
 
 -- Q10. The insurance company is to going to run a promotion campaign. If you buy a new policy (whether solely or jointly) and it is finally approved (i.e., the status becomes E), all other active and enforced policies that you are involved (including solely and jointly) will have their expiry dates extended by 30 calendar days. However, if any staff of the company is covered by the new policy, this promotion will not apply. Create a trigger (or triggers) to keep track when a policy status is changed to E and implement this promotion campaign accordingly.
