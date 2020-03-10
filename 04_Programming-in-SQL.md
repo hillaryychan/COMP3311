@@ -165,3 +165,226 @@ $$ language sql
 -- which is used as
 select * from EmpList();
 ```
+
+## PLpgSQL
+
+PLpgSQL or Procedural Language extensions to PostgreSQL integrate features of a procedural programming language and SQL programming.  
+It provides a means of _extending DBMS functionality_ e.g:
+
+* implementing constraint checking (trigger functions)
+* complex query evaluation (e.g recursion)
+* complex computation of column values
+* detailed control of displayed results
+
+### Defining PLpgSQL Functions
+
+PLpgSQL functions are created (and inserted into databases) via:
+
+```
+CREATE OR REPLACE funcName(param1, param2, ...) RETURN retType
+AS $$
+DECLARE
+    variable declarations
+BEGIN
+    code for function
+END:
+$$ LANGUAGE plpgsql
+-- Note the entire function body is a single SQL string
+```
+
+Example: a function to return 2n, for a given n
+``` sql
+create or replace double(n integer) returns integer
+as $$
+declare
+    res integer;
+begin
+    res := 2*n;
+    return res;
+end;
+$$ language plpgsql;
+
+--or, more simply
+... $$
+begin
+return 2*n;
+end;
+$$ ...
+```
+
+Example: create a function ("a","b") which produces "a'b"
+
+``` sql
+--new-style function
+CREATE OR REPLACE FUNCTION cat(x text, y text) RETURNS text
+as $add$
+DECLARE
+    result text; -- local variable
+BEGIN
+    result := x||''''||y;
+    return result;
+END;
+$add$ LANGUAGE plpgsql;
+
+-- Note: NEVER give parameters the same name as an attribute
+-- a strategy to counter this would be to 
+-- start all parameter names with an underscore
+
+-- old-style function
+CREATE OR REPLACE FUNCTION cat(text, text) RETURNS text
+as '
+DECLARE
+    x alias $1;  -- alias for parameter
+    y alias $2;  -- alias for parameter
+    result text; -- local variable
+BEGIN
+    result := x||''''''''||y;
+    return result;
+END;
+' LANGUAGE plpgsql;
+```
+
+Example: a solution to our "withdrawal" problem in PLpgSQL
+``` sql
+create function withdraw(acctNum text, amount integer) returns text
+as $$
+declare bal integer;
+begin
+    set bal = (select balance from Accounts where acctNo = acctNum);
+    if (bad < amount) then
+        return 'Insufficent Funds';
+    else
+        update Accounts
+        set balance = balance - amount
+        where acctNo = acctNum;
+        set bal = (select balance from Accounts where acctNo = acctNum)
+        return 'New Balance: '||bal;
+    end if;
+end;
+$$ langauge plpgsql;
+```
+
+### PLpgSQL Gotchas
+
+Some things to be aware of:
+
+* does not provide any I/O facilities (except `RAISE NOTICE`); the aim is to build complex computations on tables that SQL alone cannot do
+* functions are not syntax-checked when loaded into the database; you don't find out about the syntax error until 'run-time'
+* error messages are sometimes not particularly helpful
+* functions are defined as strings; change of _lexicographical scopre_ can sometimes be confusing
+* giving params/variables the same name as attributes
+
+In general, debugging PLpgSQL can sometimes be tricky
+
+### PLpgSQL Data Types
+
+PLpgSQL constants and variables can be defined using:
+
+* standard SQL data types (`CHAR`, `DATE`, `NUMBER`, etc.)
+* user-defined PostgreSQL data types (e.g. `Point`)
+* a special structured record type (`RECORD`)
+* table-row types (e.g. `Branches%ROWTYPE`)
+* types of existing variables (e.g. `Branches.location%TYPE`)
+
+There is also a `CURSOR` type for interacting with SQL.
+
+Variables can also be defined in terms of:
+
+* the type of an existing variable or table column
+* the type of an existing table row (implicit `RECORD` type)
+
+Examples:
+
+``` sql
+quantity    INTEGER;
+start_qty   quantity%TYPE;
+employee    Employees%ROWTYPE;
+name        Employees.name%TYPE;
+```
+
+### PLpgSQL Syntax and Control Structures
+
+A standard assignment operator is available
+
+``` sql
+-- Assignment
+var := expr
+SELECT expr INTO var
+
+-- Selection
+IF c1 THEN s1
+ELSIF c2 THEN s2
+ELSE s END IF
+
+-- Iteration
+LOOP s END LOOP
+WHILE c LOOP s END LOOP
+FOR rec_var IN query LOOP ...
+FOR int_var IN lo..hi LOOP ...
+```
+
+### `SELECT ... INTO`
+
+We can capture query results via:
+
+``` sql
+SELECT Exp1, Exp2,...,Expn
+INTO Var1, Var2,...,Varn
+FROM TableList
+Where Conditions...
+```
+
+The semantics execute the query as usual, return a 'projection list' (Exp1,Exp2,...) as usual and assign each Expri to a corresponding Vari.
+
+Assigning a simple value via `SELECT...INTO`:
+``` sql
+-- cost is local var, price is attr
+SELECT price INTO cost
+FROM StockList
+WHERE item = 'Cricket Bat';
+cost := cost * (1+tax_rate);
+total := total + cost;
+```
+
+The current PostgreSQL parser also allows this syntax:
+``` sql
+SELECT INTO cost price
+FROM StockList
+WHERE item = 'Cricket Bat';
+```
+
+Assigning whole rows via `SELECT...INTO`:
+
+``` sql
+DECLARE
+    emp Employees%ROWTYPE;
+    eName text;
+    pay real;
+
+BEGIN
+    SELECT * INTO emp
+    FROM Employees WHERE id = 966543;
+    eName := emp.name;
+    ...
+    SELECT name,salary INTO eName,pay
+    FROM Employees WHERE id = 966543;
+END;
+```
+
+In the case of a PLpgSQL statement like `select a into b from R where ...`  
+If the selection returns no tuples the variable b gets the value `NULL`
+If the selection returns multiple tuples the variable b gets the value from the first tuple
+
+An alternative to check for "no data found" is to use the special variable `FOUND`. It is:
+
+* local to each function, set false at start of function
+* set true if a SELECT finds at least one tuple
+* set true if INSERT/DELETE/UPDATE affects at least one tuple
+* otherwise, remains as FALSE
+
+Example of use:
+``` sql
+select a into b from R where ...
+if (not found) then
+-- handle case where no matching tuples b
+```
