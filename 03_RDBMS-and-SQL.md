@@ -630,11 +630,74 @@ from Popularity
 where ndrinkers = (select max(ndrinkers) from Popularity);
 
 -- 16. Which bar is most expensive (Maximum average price)
+
+create view AvgPrice(bar, avgPrice) as
+select bar, avg(price)
+from   Sells
+group  by bar;
+
+select bar
+from   AvgPrice
+where  avgPrice = (select max(avgPrice) from AvgPrice);
+
 -- 17. Which beers are sold at all bars?
+
+-- Basic approach:
+-- for each beer b {
+--     BB = set of bars where b is sold
+--     AB = set of all bars
+--     if (AB == BB) then b is sold at all bars
+-- }
+
+-- "foreach beer b" is implemented as:
+
+-- select name
+-- from   Beers b
+-- where  some-Condition-Involving-b
+
+-- Unfortunately, SQL does not have set equality
+-- but it does have set difference and empty set check
+-- so rephrase above test as
+--
+--     if (isEmpty(AB - BB)) then b is sold at all bars
+
+-- Soln:
+
+select name
+from   Beers b
+where  not exists (                                  -- isEmpty
+        (select name from Bars)                      -- AB
+        except                                       -- set diff
+        (select bar from Sells where beer = b.name)  -- BB
+       );
+
 -- 18. Price of cheapest beer at each bar?
+
+create view Cheapest(bar, price) as
+select bar, min(price)
+from   Sells
+group  by bar;
+
+select * from   Cheapest;
+
 -- 19. Name of cheapest beer at each bar?
+
+select s.*
+from   Sells s
+where  s.price = (select price from Cheapest where bar = s.bar);
+
 -- 20. How many drinkers are in each suburb?
+
+create view DrinkerPlaces(suburb,ndrinkers) as
+select addr, count(*)
+from   Drinkers
+group  by addr;
+
 -- 21. How many bars in suburbs where drinkers live? (Must include suburbs with no bars)
+
+select d.addr, count(b.name)
+from   Drinkers d left outer join Bars b on (d.addr = b.addr)
+group  by d.addr;
 ```
 
 ## Extending SQL
