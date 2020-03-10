@@ -98,25 +98,27 @@ where p.pid in (
 
 -- Q8. For each policy X, compute the number of other policies (excluding X) whose coverage is contained by the coverage of X. For example, if a policy X has 3 coverages (identified by cname), say {C1, C2, C3}, and another policy Y has 2 coverages, {C1, C3}, we say Y's coverage is contained by X's. In case if X's and Y's coverages are identical, their coverages are contained by each other. Order the result by pno in ascending order.
 
-create or replace view policy_coverage as 
-select p.pno, c2.coid, c1.cname 
-from policy p, coverage c1, coverage c2 
+create or replace view policy_coverage as
+select p.pno, c2.coid, c1.cname
+from policy p, coverage c1, coverage c2
 where p.pno=c1.pno and c1.cname=c2.cname;
 
-create or replace view Q8(pno, npolicies) as
-select p1.pno, count(p2.pno) 
-from policy p1, policy p2 
-where not exists (
+create or replace view policy_contains as
+select p1.pno, p2.pno as contains from policy p1, policy p2
+where p1.pno<>p2.pno and not exists (
     select pc2.coid from policy_coverage pc2 where pc2.pno=p2.pno
     except
-    select pc1.coid from policy_coverage pc1 where pc1.pno=p1.pno)
-    and p1.pno<>p2.pno 
-group by p1.pno order by p1.pno;
+    select pc1.coid from policy_coverage pc1 where pc1.pno=p1.pno);
+
+create or replace view Q8(pno, npolicies) as
+select p.pno, count(pc.contains) from policy p
+left outer join policy_contains pc on p.pno=pc.pno
+group by p.pno order by p.pno;
 
 -- Q9. Create a stored function that increases/decreases the rate by Adj% for all active (as of today) and enforced (with status E) policies. Other policies shall not be affected. Adj is an integer between -99 and 99. For example, if the original rate is 200 and Adj is -20, the new rate will be 160. If the original rate is 300 and Adj is 10, the new rate will be 330. The function returns the number of policies that have been adjusted.
 
 -- what does it mean by 'active (as of today)'
-create or replace function ratechange(Adj integer) returns integer
+--create or replace function ratechange(Adj integer) returns integer
 --as $$
 --declare
 ---- variables
