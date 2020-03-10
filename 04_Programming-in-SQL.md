@@ -323,7 +323,7 @@ FOR rec_var IN query LOOP ...
 FOR int_var IN lo..hi LOOP ...
 ```
 
-### `SELECT ... INTO`
+### SELECT ... INTO
 
 We can capture query results via:
 
@@ -378,9 +378,9 @@ If the selection returns multiple tuples the variable b gets the value from the 
 An alternative to check for "no data found" is to use the special variable `FOUND`. It is:
 
 * local to each function, set false at start of function
-* set true if a SELECT finds at least one tuple
-* set true if INSERT/DELETE/UPDATE affects at least one tuple
-* otherwise, remains as FALSE
+* set true if a `SELECT` finds at least one tuple
+* set true if `INSERT`/`DELETE`/`UPDATE` affects at least one tuple
+* otherwise, remains as `FALSE`
 
 Example of use:
 ``` sql
