@@ -8,3 +8,4 @@
     4. [Mapping ER Designs to Relational Schemas](https://github.com/hillaryychan/COMP3311/blob/master/02_Data-Modelling.md#Mapping-ER-Designs-to-Relational-Schemas)
 3. [Relational DBMS and SQL](https://github.com/hillaryychan/COMP3311/blob/master/03_RDBMS-and-SQL.md)
 4. [Programming in SQL](https://github.com/hillaryychan/COMP3311/blob/master/04_Programming-in-SQL.md)
+5. [More PLpgSQL](https://github.com/hillaryychan/COMP3311/blob/master/05_More-PLpgSQL.md)

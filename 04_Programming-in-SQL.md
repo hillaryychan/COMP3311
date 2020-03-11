@@ -388,3 +388,143 @@ select a into b from R where ...
 if (not found) then
 -- handle case where no matching tuples b
 ```
+
+### Recursion and Iteration
+
+PLpgSQL is a programming language: containing variables, assignment, conditionals, loops, functions combined with database interactions (via SQL) functions are stored in the databased and invoked from SQL.
+
+Example: a factorial function in PLpgSQL
+
+``` sql
+-- an iterative approach
+create or replace function
+    faci(n integer) returns numeric
+as $$
+declare
+    i numeric;
+    f numeric := 1;
+begin
+    for i in 1..n
+    loop
+        f := f * i;
+    end loop;
+    return f;
+end;
+$$ language plpgsql;
+
+-- a recursive approach
+create or replace function
+    facr(n integer) returns integer
+as $$
+declare
+    i integer;
+    f integer := 1;
+begin
+    if (n <= 1) then
+        return 1;
+    else
+        return n * facr(n-1);
+    end if;
+end;
+$$ language plpgsql;
+```
+
+### Debugging Output
+
+Depending on how PostgreSQL is configured `raise notice` allows you to display information from a function. The output is displayed in the `psql` window during the function's execution.  
+Usage: `raise notice 'String with % symbols', value1, ..., valuen;`
+
+``` sql
+create or replace function
+    showi(n integer) returns void
+as $$
+declare
+    i integer;
+begin
+    for i in 1..n
+    loop
+        raise notice 'Next value is %',i;
+    end loop;
+end;
+$$ language plpgsql;
+```
+
+### Returning Multiple Values
+
+PLpgSQL functions can return a `setof` values, which is effectively a function returning a table. The values could be atomic like a single column, or they could be tuples like a full table.
+
+Atomic types include: `integer`, `float`, `numeric`, `date`, `text`, `varchar(n)`  
+Tuple types can be declared like this:
+
+``` sql
+create type Point as (x float, y float);
+create type Student as (id integer, name text, degree text, wam float, ...);
+```
+
+Example function returning a set of tuples
+
+``` sql
+create type MyPoint as (x integer, y integer);
+create or replace function
+    points(n integer, m integer) returns setof MyPoint
+as $$
+declare
+    i integer; j integer;
+    p MyPoint; -- tuple variable
+begin
+    for i in 1 .. n loop
+        for j in 1 .. m loop
+            p.x := i; p.y := j;
+            return next p;
+        end loop;
+    end loop;
+end;
+$$ language plpgsql;
+```
+
+### Query Results in PLpgSQL
+
+We can evaluate a query and iterate through its results one tuple at a time using a `for..loop`.
+
+``` sql
+create or replace function
+    well_paid(_minsal integer) returns integer
+as $$
+declare
+    nemps integer := 0;
+    tuple record;
+begin
+    for tuple in select * from Employees where salary > _minsal
+    loop
+        nemps := nemps + 1;
+    end loop;
+    return nemps;
+end;
+$$ language plpgsql;
+
+-- an alternative but less efficient solutions would have the loop like this:
+for tuple in select * from Employees
+loop
+    if (tuple.salary > _minsal) then
+    end if;
+end loop;
+```
+
+### INSERT ... RETURNING
+
+We can capture values from tuples inserted into the database by using `insert ... returning` 
+
+Usage:
+``` sql
+insert into Table(...) values (val1, val2, ..., valn)
+returning ProjectionList into VarList;
+```
+
+Example:
+``` sql
+declare newid intger; colour text;
+...
+insert into T(id,a,b,c) values(default,2,3,'red')
+returning id,c into newid,colour;
+-- id contains the primary key value for the new tuple T(?,2,3,'red')
+```
