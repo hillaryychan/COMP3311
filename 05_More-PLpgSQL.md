@@ -135,7 +135,7 @@ Note: `OLD` does not exist for insertion and `NEW` does not exist for deletion.
 
 Sequence of activities during database update:
 
-![databse activity sequence](imgs/5-22_datavase-activity-sequence.png)
+![database activity sequence](imgs/5-22_datavase-activity-sequence.png)
 
 Reminder: `BEFORE` can modify the value of a new tuple
 
@@ -358,7 +358,8 @@ create function totalSalary3() returns trigger
 as $$
 begin
     if (old.dept is not null) then
-        update Department
+        ut
+pdate Department
         set
         totSal = totSal - old.salary
         where Department.id = old.dept;
@@ -367,3 +368,223 @@ begin
 end;
 $$ language plpgsql;
 ```
+
+## Exceptions
+
+PLpgSQL supports exception handling via
+
+``` sql
+begin
+    Statements ...
+exception
+    when Exceptions1 then
+        StatementForHandler1
+    when Exceptions2 then
+        StatementForHandler2
+    ...
+end;
+```
+
+Each Exceptionsi is an `OR` list of exception names e.g. `division_by_zero OR floating_point_exception OR ..`
+
+When an exception occurs:
+
+* control is transferred to the relevant exception handling code
+* all database changes so far in this transaction are undone
+* all function variables retain their current values
+* handler executes and then the transaction aborts (and function exits)
+
+If there is no handler in the current scope, the exception is passed to next outer level.  
+The default exception handlers at the outermost level exit and log error.
+
+Example of exception handling:
+``` sql
+-- table T contains one tuple ('Tom', 'Jones')
+declare
+    x integer := 3;
+begin
+    update T set firstname = 'Joe'
+    when lastname = 'Jones';
+    -- table T now contains ('Joe', 'Jones')
+    x := x + 1;
+    y := y / 0;
+exception
+    when division_by_zero then
+        -- update on T is rolled back to ('Tom', 'Jones')
+        raise notice 'caught division_by_zero';
+        return x; -- return may or may not work here
+                  -- if it does, the value returned is 4
+end;
+```
+
+The `raise` operator can generate server log entries. e.g.
+``` sql
+raise debug 'Simple message';
+raise notice 'User = %', user_id;
+raise exception 'Fatal: value was %', value;
+```
+
+There are several levels of severity: `DEBUG`, `INFO`, `NOTICE`, `WARNING`, and `EXCEPTION`  
+Not all severities generate a message to the client. `client_min_messages` shows which level of severity an entry must be to log to output. You can view and change the level using `show client_min_messages;` and `set client_min_messages to <level>` respectively.
+
+Server log files can grow _very_ large and are deleted when you shut your server down.
+
+The CSE server log file is `srvr/$USER/pgsql/Log`.
+
+## Dynamically Generated Queries
+
+`EXECUTE` takes a string and executes it as an SQL query.
+
+Examples:
+``` sql
+execute 'select * from Employees';
+execute 'select * from '||'Employees';
+execute 'select * from '||quote_ident($1);
+execute 'delete from Accounts '||'where holder='||quote_literal($1);
+```
+
+This can be used in any context where an SQL query is expected. It is also a mechanism that allows us to _construct_ queries "on the fly".
+
+Example: a wrapper for updating a single text field
+``` sql
+create or replace function
+    set(_tab text, _attr text, _val text) returns void
+as $$
+declare
+    query text;
+begin
+    query := 'update' || quote_ident(_tab);
+    query := query || ' SET ' || quote_ident(_attr);
+    query := query || ' = ' || quote_literal(_val);
+    EXECUTE query;
+end;
+$$ language plpgsql;
+
+-- which can be used as
+select set('branches', 'address', 'Beach St.');
+```
+
+The one limitation of `EXECUTE` is that you cannot used `select ... into ...` inside dynamic queries. Instead it needs to be expressed as:
+
+``` sql
+declare tuple R&rowtype'; n int;
+execute 'select * from R where id='||n into tuple;
+-- or
+declare x int; y int; z text;
+execute 'select a,b,c from R where id='||n into x,y,z;
+-- Note:
+-- if a query returns multiple tuples, the first one is stored
+-- if a query returns zero tuples, all nulls are stored
+```
+
+## Aggregates
+
+**Aggregates** reduces a collection of values into a single result. e.g: `count(Tuples)`, `sum(Tuples)`, `max(AnyOrderedType)`
+
+The action of an aggregate function can be viewed as:
+
+```
+State = initial state
+for each item V {
+    # update State to include V
+    State = updateState(State, V)
+}
+return makeFinal(State)
+```
+
+Aggregates are commonly used with `GROUP BY`. In that context, the "summarise" each group.
+
+![aggregate group by](imgs/5-47_aggregate-group-by.png)
+
+### User-defined Aggregates
+
+SQL standard does not specify user-defined aggregates, but PostgreSQL provides a mechanism for defining them.
+
+To define a new aggregate, you need to supply:
+
+* _BaseType_ - the type of input values
+* _StateType_ - the type of intermediate values
+* state mapping function: `sfunc(state,value) -> newState`
+* [optionally] an initial state value (defaults to null)
+* [optionally] a final function: `ffunc(state) -> result`
+
+New aggregates are defined using the `CREATE AGGREGATE` statement:
+
+``` sql
+CREATE AGGREGATE AggName(BaseType) (
+    sfunc     = UpdateStateFunction,
+    stype     = StateType,
+    initcond  = InitialValue,
+    finalfunc = MakeFinalFunction,
+    sortop    = OrderingOperator
+);
+
+-- Notes:
+-- initcond (type StateType) is optional and defaults to NULL
+-- finalfunc is optional and defaults to an identity function
+-- sortop is optional but is needed for min/max-type aggregates
+```
+
+Example: (roughly) defining the `count` aggregate
+``` sql
+create function oneMore(sum int, x anyelement) returns int
+as $$
+begin
+    return sum+1
+end;
+$$ language sql;
+
+create aggregate myCount(anyelement) (
+    stype    = int,     -- the accumulator type
+    initcond = 0,       -- initial accumulator value
+    sfunc    = oneMore  -- increment function
+);
+```
+
+Example: sum two columns of integers
+``` sql
+create type IntPair as (x int, y int);
+
+create function AddPair(sum int, p IntPair) returns int
+as $$
+begin
+    return sum + p.x + p.y;
+end;
+$$ language plpgsql;
+
+create aggregate sum2(IntPair) (
+    stype    = int,
+    initcond = 0,
+    sfunc    = AddPair
+);
+```
+
+## Catalogs
+
+DBMSs store:
+
+* data (tuples organised into tables)
+* stored procedures (e.g. PLpgSQL functions)
+* indexes (to provide efficient access to data)
+* meta-data (information giving the structure of the data)
+
+The latter is stored in the **system catalog**  
+A standard `information_schema` exists for describing metadata, but was developed long after DBMSs had implemented their own catalogs. PostgreSQL has both PG catalof Ch.52 and Information Schema Ch.37
+
+### PostgreSQL Catalog
+
+catalog = meta-data = tables describing database objects
+
+A PostgreSQL catalog is accessible via `pg_XXX` table/views:
+
+``` sql
+pg_roles(oid, rolname, rolsuper, ...);
+pg_namespace(oid, nspname, nspowner, nspac1);
+pg_database(oid, datname, datdba, ..., datac1);
+pg_class(oid, relname, relnamespace, reltype, ...);
+pg_attribute(oid, attrrelid, attname, atttypid, ...);
+pg_type(oid, typname, typnamespace, typowner, ...);
+```
+
+Catalog tables use `oid` for primary and foreign keys..
+A standard-format catalog is also available via `information schema`
