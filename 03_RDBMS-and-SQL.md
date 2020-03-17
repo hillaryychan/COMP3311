@@ -4,13 +4,13 @@
 
 A **relational database management system (RDBMS)** is software:
 
- * designed to support large-scale data-intensive applications
- * allowing high-level description of data (tables, constraints)
- * with high-level access to the data (relational model, SQL)
- * providing efficient storage and retrieval (disk/memory management)
- * supporting multiple simultaneous users (privilege, protection)
- * doing multiple simultaneous operations (transactions, concurrency)
- * maintaining reliable access to the stored data (backup, recovery)
+* designed to support large-scale data-intensive applications
+* allowing high-level description of data (tables, constraints)
+* with high-level access to the data (relational model, SQL)
+* providing efficient storage and retrieval (disk/memory management)
+* supporting multiple simultaneous users (privilege, protection)
+* doing multiple simultaneous operations (transactions, concurrency)
+* maintaining reliable access to the stored data (backup, recovery)
 
 Note: databases provide **persistent** storage of information
 
@@ -157,6 +157,7 @@ Tuples and set constants are both written as `(val1, val2, val3, ...)`
 The correct interpretation is worked out from the context.
 
 Examples:
+
 ``` sql
 -- tuple literal
 INSERT INTO Student(studentID, name, degree) VALUES (2177364, 'Jack Smith', 'BSc');
@@ -182,6 +183,7 @@ Most data types also have type-specific operations available
 * `_` matches any single char (like `.` in regex)
 
 Examples:
+
 ``` sql
 name LIKE 'Ja%'     name beginning with 'Ja'
 name LIKE '_i%'     name has 'i' as the second letter
@@ -198,6 +200,7 @@ PostgreSQL also provides case-insensitive matching:
 It also provide full-text searching
 
 Examples of regex pattern matching:
+
 ``` sql
 name ~ '^Ja'        name beginning with 'Ja'
 name ~ '^.i'        name has 'i' as the second letter
@@ -292,6 +295,7 @@ HAVING      groupCondition;
 The result of a query is a relations, typically displayed as table. Results can be just one tuple with one attribute (i.e. one value) or even empty.
 
 Example:
+
 ``` sql
 -- Given the following schema:
 Students(id, name, ...)
@@ -320,6 +324,7 @@ The query computes the following:
 #### Joins
 
 The general join structure:
+
 ``` sql
 SELECT col1, t1.name, t2.name, colB
 FROM table1 as t1
@@ -344,8 +349,8 @@ Example:
 ``` sql
 -- Given this small database:
 create table R (
-	x  integer primary key,
-	y  text
+  x  integer primary key,
+  y  text
 );
 
 insert into R values (1,'abc');
@@ -353,8 +358,8 @@ insert into R values (2,'def');
 insert into R values (3,'ghi');
 
 create table S (
-	z  char(1) primary key,
-	x  integer references R(x)
+  z  char(1) primary key,
+  x  integer references R(x)
 );
 
 insert into S values ('a',1);
@@ -363,44 +368,44 @@ insert into S values ('c',1);
 insert into S values ('d',null);
 
 -- select * from R natural join S;
-x	y	z
-1	abc	a
-1	abc	c
-3	ghi	b
+x     y     z
+1     abc   a
+1     abc   c
+3     ghi   b
 
 -- select * from R join S on (R.x = S.x);  -- join means inner join (inner is optional and is the default)
-x	y	z	x
-1	abc	a	1
-1	abc	c	1
-3	ghi	b	3
+x     y     z   x
+1     abc   a   1
+1     abc   c   1
+3     ghi   b   3
 
 -- select * from R, S where R.x = S.x;
-x	y	z	x
-1	abc	a	1
-1	abc	c	1
-3	ghi	b	3
+x     y     z   x
+1     abc   a   1
+1     abc   c   1
+3     ghi   b   3
 
 -- select * from R left outer join S on (R.x = S.x);  -- outer not compulsory when left, right, and full are used
-x	y	z	x
-1	abc	a	1
-1	abc	c	1
-2	def	
-3	ghi	b	3
+x     y     z   x
+1     abc   a   1
+1     abc   c   1
+2     def
+3     ghi   b   3
 
 -- select * from R right outer join S on (R.x = S.x);
-x	y	z	x
-1	abc	a	1
-1	abc	c	1
-3	ghi	b	3
-		d	
+x     y     z   x
+1     abc   a   1
+1     abc   c   1
+3     ghi   b   3
+            d
 
 -- select * from R full outer join S on (R.x = S.x);
-x	y	z	x
-1	abc	a	1
-1	abc	c	1
-2	def	
-3	ghi	b	3
-		d
+x     y     z   x
+1     abc   a   1
+1     abc   c   1
+2     def
+3     ghi   b   3
+            d
 ```
 
 #### Problem-solving in SQL
@@ -494,11 +499,11 @@ select beer from Likes where drinker = 'John';
 -- approach 1: join Likes with Beer and filter
 -- note: manufacturers are distinct because John may like beers made by the same brewer
 select distinct b.manf
-from Beers b join Likes l on l.beer = b.name 
+from Beers b join Likes l on l.beer = b.name
 where l.drinker = 'John';
 
 -- approach 2: use the previous query to get a set of beers
--- this approach is slower than using JOINS because for each beer in Beers 
+-- this approach is slower than using JOINS because for each beer in Beers
 -- we need to check if it is in John's favourite beers
 select distinct manf
 from Beers
@@ -608,7 +613,7 @@ from Sells
 where beer in (select * from CommonBeers)
 group by beer;
 
--- 14. Which bar sells 'New' cheapest 
+-- 14. Which bar sells 'New' cheapest
 
 -- find cheapest price New is sold for
 select min(price) from Sells where beer = 'New';

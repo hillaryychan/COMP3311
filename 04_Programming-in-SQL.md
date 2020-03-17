@@ -11,7 +11,7 @@ and SQL cannot do any of these.
 
 ## Database Programming
 
-Database programming requires a combination of 
+Database programming requires a combination of
 
 * manipulation of data in databases (via SQL)
 * conventional programming (via procedural code)
@@ -110,6 +110,7 @@ The return value is the result of the last SQL statement
 For a function to return a table, use: `return setof TupleType`
 
 Examples:
+
 ``` sql
 -- max price of specified beer
 create or replace function maxPrice(text) returns float
@@ -180,7 +181,7 @@ It provides a means of _extending DBMS functionality_ e.g:
 
 PLpgSQL functions are created (and inserted into databases) via:
 
-```
+``` sql
 CREATE OR REPLACE funcName(param1, param2, ...) RETURN retType
 AS $$
 DECLARE
@@ -193,6 +194,7 @@ $$ LANGUAGE plpgsql
 ```
 
 Example: a function to return 2n, for a given n
+
 ``` sql
 create or replace double(n integer) returns integer
 as $$
@@ -227,7 +229,7 @@ END;
 $add$ LANGUAGE plpgsql;
 
 -- Note: NEVER give parameters the same name as an attribute
--- a strategy to counter this would be to 
+-- a strategy to counter this would be to
 -- start all parameter names with an underscore
 
 -- old-style function
@@ -245,6 +247,7 @@ END;
 ```
 
 Example: a solution to our "withdrawal" problem in PLpgSQL
+
 ``` sql
 create function withdraw(acctNum text, amount integer) returns text
 as $$
@@ -337,6 +340,7 @@ Where Conditions...
 The semantics execute the query as usual, return a 'projection list' (Exp1,Exp2,...) as usual and assign each Expri to a corresponding Vari.
 
 Assigning a simple value via `SELECT...INTO`:
+
 ``` sql
 -- cost is local var, price is attr
 SELECT price INTO cost
@@ -347,6 +351,7 @@ total := total + cost;
 ```
 
 The current PostgreSQL parser also allows this syntax:
+
 ``` sql
 SELECT INTO cost price
 FROM StockList
@@ -383,6 +388,7 @@ An alternative to check for "no data found" is to use the special variable `FOUN
 * otherwise, remains as `FALSE`
 
 Example of use:
+
 ``` sql
 select a into b from R where ...
 if (not found) then
@@ -512,15 +518,17 @@ end loop;
 
 ### INSERT ... RETURNING
 
-We can capture values from tuples inserted into the database by using `insert ... returning` 
+We can capture values from tuples inserted into the database by using `insert ... returning`
 
 Usage:
+
 ``` sql
 insert into Table(...) values (val1, val2, ..., valn)
 returning ProjectionList into VarList;
 ```
 
 Example:
+
 ``` sql
 declare newid intger; colour text;
 ...

@@ -54,4 +54,3 @@ The typical environment for a typical DBMS is:
 ![typical modern DBMS](imgs/1-27_database-system-architecture.png)
 
 SQL queries and results travel along the client-server links
-

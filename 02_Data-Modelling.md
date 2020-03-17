@@ -350,7 +350,7 @@ Note that the primary key of the strong entity and the descriminator in the weak
 
 ### Mapping N:M Relationships
 
-Many-to-many relationships can be mapped to a new relation, where the primary keys of entities involved in the relationship are foreign keys in this relations. 
+Many-to-many relationships can be mapped to a new relation, where the primary keys of entities involved in the relationship are foreign keys in this relations.
 
 ![Map N:M relationship](imgs/2-21_map-nm-rel.png)
 
@@ -368,7 +368,7 @@ The second method is incorrect because when using a new relation to represent th
 
 ### Mapping 1:1 Relationships
 
-When mapping one-to-one relationships, you will add relationship data to one entity/relation. Which relation you add it to depends on the participation of the relationship. 
+When mapping one-to-one relationships, you will add relationship data to one entity/relation. Which relation you add it to depends on the participation of the relationship.
 
 If one entity is totally participant in the relationship, the relationship data should be added to that entity. Otherwise we won't be able to _enforce_ the concept of total participation as we won't know whether all tuples have been used.
 

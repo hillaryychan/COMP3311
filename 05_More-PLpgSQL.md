@@ -44,6 +44,7 @@ The condition is expressed as "there are no violations in the database"
 The implementation involves asking a query to find all violations, and checking for an empty result
 
 Example: the # of students in any UNSW course must be <10000
+
 ``` sql
 create assertion ClassSizeConstraint check (
     not exists (
@@ -55,11 +56,12 @@ create assertion ClassSizeConstraint check (
 ```
 
 Example: the asset of a bank branch is equal to the sum of its account balances
+
 ``` sql
 create assertion AssetCheck check (
     not exists (
         select branchName from branches b
-        where b.assets <> 
+        where b.assets <>
             (select sum(a.balance) from Accounts a
              where a.branch = b.location)
     )
@@ -179,7 +181,6 @@ Sequence of events:
 8. execute `Code2` for trigger `Y`
 9. code has access to final version of tuple via `NEW`
 10. code typically does final checking, or modifies other tables in database to ensure constraints are satisfied
-
 
 Consider two triggers and an **DELETE** statement:
 
@@ -398,6 +399,7 @@ If there is no handler in the current scope, the exception is passed to next out
 The default exception handlers at the outermost level exit and log error.
 
 Example of exception handling:
+
 ``` sql
 -- table T contains one tuple ('Tom', 'Jones')
 declare
@@ -418,6 +420,7 @@ end;
 ```
 
 The `raise` operator can generate server log entries. e.g.
+
 ``` sql
 raise debug 'Simple message';
 raise notice 'User = %', user_id;
@@ -436,6 +439,7 @@ The CSE server log file is `srvr/$USER/pgsql/Log`.
 `EXECUTE` takes a string and executes it as an SQL query.
 
 Examples:
+
 ``` sql
 execute 'select * from Employees';
 execute 'select * from '||'Employees';
@@ -446,6 +450,7 @@ execute 'delete from Accounts '||'where holder='||quote_literal($1);
 This can be used in any context where an SQL query is expected. It is also a mechanism that allows us to _construct_ queries "on the fly".
 
 Example: a wrapper for updating a single text field
+
 ``` sql
 create or replace function
     set(_tab text, _attr text, _val text) returns void
@@ -483,7 +488,7 @@ execute 'select a,b,c from R where id='||n into x,y,z;
 
 The action of an aggregate function can be viewed as:
 
-```
+``` sql
 State = initial state
 for each item V {
     # update State to include V
@@ -526,6 +531,7 @@ CREATE AGGREGATE AggName(BaseType) (
 ```
 
 Example: (roughly) defining the `count` aggregate
+
 ``` sql
 create function oneMore(sum int, x anyelement) returns int
 as $$
@@ -542,6 +548,7 @@ create aggregate myCount(anyelement) (
 ```
 
 Example: sum two columns of integers
+
 ``` sql
 create type IntPair as (x int, y int);
 
