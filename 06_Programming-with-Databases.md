@@ -158,9 +158,150 @@ Where `psycopg2` fits in the PL/DB architecture:
 
 ### Database `connection`s
 
-### Operations on `connection`s
+`conn = psycopg2.connect(DB_connection_string)` creates a `connection` object on a named database effectively starting a session with the database (cf `psql`). It returns a `connection` object used to access the database. If it can't connect, it raises an exception.
+
+Database connection string components:
+
+* `dbname` - name of database
+* `user` - user name (for authentication)
+* `password` - user password (for authentication)
+* `host` - where the server is running (default is localhost)
+* `port` - which port is the server listening on (default=5432
+
+On `grieg` only `dbname` is required.
+
+Example: a simple script that connects and then closes connection
+
+``` python
+import psycopg2
+
+try:
+    conn = psycopg2.connect("dbname=mydb")
+    print(conn)     # state of connection after opening
+    conn.close()
+    print(conn)     # state of connection after closing
+except Exception as e:
+    print("Unable to connect to database")
+```
+
+If `mydb` is accessible, the following output is produced:
+
+``` s
+$ python3 ex1.py
+<connection object at 0xf67186ec; dsn: 'dbname=mydb', closed: 0>
+<connection object at 0xf67186ec; dsn: 'dbname=mydb', closed: 1>
+```
+
+#### Operations on `connection`s:
+
+* `cur = conn.cursor()` sets up a handle for performing queries/updates on a database. You must create a `cursor` before performing any database operations
+* `conn.close()` closes the database connection `conn`
+* `conn.commit()` commits changes made to the database since the last `commit()`
+
+See Psycopg2 documentation for more.
 
 ### Database `cursor`s
 
-### Operations on `cursor`s
+Cursors are "pipelines" to the database.  
+Cursor objects allow you to execute queries, perform updates, change meta-data etc.
 
+Cursors are created from a database `connection`. You can create multiple cursors from the same connection. Each cursor handles one database operation at a time, but they are not isolated (i.e. they can see each others' changes)
+
+To set up a cursor called `cur` use `cur = conn.cursor()`
+
+#### Operations on `cursor`s:
+
+`cur.execute(SQL_statement, Values)` executes a query.  
+If supplied, it inserts values into the SQL statement, then executes the SQL statement. Results are available via the cursor's fetch methods.
+
+Examples:
+
+``` python
+# run a fixed query
+cur.execute("select * from R where x=1")
+
+# run a query with values inserted
+cur.execute("select * from R where x = %s", (1,))
+cur.execute("select * from R where x = %s", [1])
+
+# run a query stored in a variable
+query = "select * from Students where name ilike %s"
+pattern = "%mith%"
+cur.execute(query, pattern)
+```
+`cur.mogrify(SQL_statement, Values)` returns the SQL statement as a string with values inserted.  
+It is useful for checking whether `execute()` is doing what you want
+
+Examples:
+``` python
+query = "select * from R where x = %s"
+print(cur.mogrify(query, [1])
+# Produces: b'select * from R where x = 1'
+
+query = "select * from R where x = %s and y = %s"
+print(cur.mogrify(query, [1,5]))
+# Produces: b'select * from R where x = 1 and y = 5'
+
+query = "select * from Students where name ilike %s"
+pattern = "%mith%"
+print(cur.mogrify(query, [pattern]))
+# Produces: b"select * from Students where name ilike '%mith%'"
+
+query = "select * from Students where family = %s"
+fname = "O'Reilly"
+print(cur.mogrify(query, [fname]))
+# Produces: b"select * from Students where family = 'O''Reilly'"
+```
+
+`list = cur.fetchall()` gets all answers for a query and stores it in a list of tuples.
+
+Examples:
+``` python
+# table R contains (1,2), (2,1), ...
+cur.execute("select * from R")
+for tup in cur.fetchall():
+    x,y = tup
+    print(x,y)
+# or print(tup[0],tup[1])
+# prints
+# 1 2
+# 2 1
+# ...
+```
+
+`tup = cur.fetchone()` gets the next result for a query and stores it in a tuple.
+
+Examples:
+``` python
+# table R contains (1,2), (2,1), ...
+cur.execute("select * from R")
+while True:
+    t = cur.fetchone()
+    if t == None:
+        break
+        print(x,y)
+# prints
+# 1 2
+# 2 1
+# ...
+```
+
+`tup = cur.fetchmany(nTuples)` gets the next `nTuples` results for a query.  
+It stores the tuples in a list. When there are no results, it returns an empty list
+
+Examples:
+``` python
+# table R contains (1,2), (2,1), ...
+cur.execute("select * from R")
+while True:
+    tups = cur.fetchmany(3)
+    if tups == []:
+        break
+        for tup in tups:
+            x,y = tup
+            print(x,y)
+# prints
+# 1 2
+# 2 1
+# ...
+```
