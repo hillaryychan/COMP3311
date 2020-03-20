@@ -192,7 +192,7 @@ $ python3 ex1.py
 <connection object at 0xf67186ec; dsn: 'dbname=mydb', closed: 1>
 ```
 
-#### Operations on `connection`s:
+#### Operations on `connection`s
 
 * `cur = conn.cursor()` sets up a handle for performing queries/updates on a database. You must create a `cursor` before performing any database operations
 * `conn.close()` closes the database connection `conn`
@@ -209,7 +209,7 @@ Cursors are created from a database `connection`. You can create multiple cursor
 
 To set up a cursor called `cur` use `cur = conn.cursor()`
 
-#### Operations on `cursor`s:
+#### Operations on `cursor`s
 
 `cur.execute(SQL_statement, Values)` executes a query.  
 If supplied, it inserts values into the SQL statement, then executes the SQL statement. Results are available via the cursor's fetch methods.
@@ -229,10 +229,12 @@ query = "select * from Students where name ilike %s"
 pattern = "%mith%"
 cur.execute(query, pattern)
 ```
+
 `cur.mogrify(SQL_statement, Values)` returns the SQL statement as a string with values inserted.  
 It is useful for checking whether `execute()` is doing what you want
 
 Examples:
+
 ``` python
 query = "select * from R where x = %s"
 print(cur.mogrify(query, [1])
@@ -256,6 +258,7 @@ print(cur.mogrify(query, [fname]))
 `list = cur.fetchall()` gets all answers for a query and stores it in a list of tuples.
 
 Examples:
+
 ``` python
 # table R contains (1,2), (2,1), ...
 cur.execute("select * from R")
@@ -272,6 +275,7 @@ for tup in cur.fetchall():
 `tup = cur.fetchone()` gets the next result for a query and stores it in a tuple.
 
 Examples:
+
 ``` python
 # table R contains (1,2), (2,1), ...
 cur.execute("select * from R")
@@ -290,6 +294,7 @@ while True:
 It stores the tuples in a list. When there are no results, it returns an empty list
 
 Examples:
+
 ``` python
 # table R contains (1,2), (2,1), ...
 cur.execute("select * from R")
