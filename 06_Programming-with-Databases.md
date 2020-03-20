@@ -198,7 +198,7 @@ $ python3 ex1.py
 * `conn.close()` closes the database connection `conn`
 * `conn.commit()` commits changes made to the database since the last `commit()`
 
-See Psycopg2 documentation for more.
+See [Psycopg2 documentation](https://www.psycopg.org/docs/) for more.
 
 ### Database `cursor`s
 
