@@ -575,7 +575,7 @@ DBMSs store:
 * indexes (to provide efficient access to data)
 * meta-data (information giving the structure of the data)
 
-The latter is stored in the **system catalog**  
+The latter is stored in the **system catalog**. It contains information about tables, the structure of data, system information and all sorts of other information  
 A standard `information_schema` exists for describing metadata, but was developed long after DBMSs had implemented their own catalogs. PostgreSQL has both PG catalof Ch.52 and Information Schema Ch.37
 
 ### PostgreSQL Catalog
@@ -595,3 +595,61 @@ pg_type(oid, typname, typnamespace, typowner, ...);
 
 Catalog tables use `oid` for primary and foreign keys..
 A standard-format catalog is also available via `information schema`
+
+Example: using `pg_catalog` to implement a simplified `psql -l`
+
+``` sql
+create or replace view Databases("Name", "Owner") as
+select d.datname, r.rolname
+from pg_database d joing pg_roles r on d.databa = r.oid;
+order by d.datname;
+```
+
+Example: implement `dbPop()` which lists all of the tables in the public schema and counts the number of tuples in each table. Tuples returned have type `PopulationRecord(tablename, n_records)`
+
+``` sql
+create type PopulationRecord as (tablename text, ntuples integer);
+
+create or replace function dbPop() returns setof PopulationRecord
+as $$
+declare
+    r record;
+    nr integer;
+    res PopulationRecord;
+    countQry text;
+begin
+    for r in select tablename
+             from pg_tables
+             where schemaname='public'
+             order by tablename
+    loop
+        -- note: select count(*) into nr from r.tablename DOES NOT WORK
+        countQry := 'select count(*) from '||r.tablename;
+        execute countQry into nr;
+        res.tablename := r.tablename;
+        res.ntuples := nr;
+        return next res;
+    end loop;
+end;
+$$ language plpgsql;
+```
+
+Example: implement `dbSchema()` that gives a list of tables in the public schema and the attributes for each table. Tuples returned have type `SchemaRecord(tablename, attributes)`
+
+``` sql
+create type SchemaRecord as ("table" text, "attributes" text);
+
+create or replace function dbSchema() returns setof SchemaRecord
+as $$
+begin
+    return query
+        select c.relname::text, a.attname::text
+        from pg_class c join pg_attribute a on a.attrelid = c.oid
+        where relkind='r'
+            and relname not like 'pg_%'
+            and relname not like 'sql_%'
+            and attnum > 0
+        order by relname, attnum;
+end;
+$$ language plpgsql;
+```
