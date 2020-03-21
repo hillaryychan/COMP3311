@@ -319,7 +319,7 @@ One useful strategy for database design is to:
 1. perform initial data modelling using ER (conceptual-level modelling)
 2. transform conceptual design into relational model (implementation-level modelling)
 
-A formal mapping exists for ER models to relational models. This maps "strucutres" but additional information is needed such as constraints domain for attributes and other constraints.
+A formal mapping exists for ER models to relational models. This maps "structures" but additional information is needed such as constraints domain for attributes and other constraints.
 
 A general correspondence between relational and ER data models is:
 
