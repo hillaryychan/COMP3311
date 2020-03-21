@@ -94,8 +94,8 @@ The **cardinality** of a relationship is the  of associated entities on each sid
 The **level of participation constraint** in a relation constrain can be defined as:  
 The participation in a relationship set **R** by and entity set **A** may be
 
-* **total** - every _a_∈_A_ participates in more than one relationship in **R**
-* **partial** - only some _a_∈_A_ participates in relationships in **R**
+* **total** - every _a_ ∈ _A_ participates in more than one relationship in **R**
+* **partial** - only some _a_ ∈ _A_ participates in relationships in **R**
 
 E.g every bank loan is taken out by at least one customer, but not every customer has a bank loan
 ![ER participation](imgs/1-42_ER_participation.png)
@@ -221,8 +221,8 @@ e.g. `Student(id,...)` is guaranteed to be unique, `Class(...,day,time,location,
 * **entity integrity contraints** require keys to be fully-defined, that is no primary key value can be `NULL`  
 e.g. `Class(...,Mon,2pm,Lyre)` is well-defined but `Class(...,NULL,2pm,Lyre,...)` is not well-defined
 * **referential integrity constraints** require references to other tables to be valid. These references are known as **foreign keys**. A set of attributes F in R1 is a foreign key in R2 if:
-  * the attributes in F correspond to the primary key of R2
-  * the value of F in each tuple of R1 either occurs as a primary key in R2 or is entirely `NULL`
+    * the attributes in F correspond to the primary key of R2
+    * the value of F in each tuple of R1 either occurs as a primary key in R2 or is entirely `NULL`
 
 ![referential integrity constraints](imgs/2-9_ref-integrity-constraint.png)
 
@@ -386,8 +386,8 @@ Our previous relationship mappings assume the relationships are binary.
 If multiple entities are involves:
 
 * `n:m` generalises naturally to `n:m:p:q`
-  * includes a foreign key for each participating entity
-  * include any other attributes of the relationship
+    * includes a foreign key for each participating entity
+    * include any other attributes of the relationship
 * other multiplicities (e.g. `1:n:m`) need to be mapped the same as `n:m:p:q` so they do not quite accurately reflect the mapping of the ER diagram
 
 Some people advocate converting n-way relationships into a new entity and a set of _n_ binary relationships.

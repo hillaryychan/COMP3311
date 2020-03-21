@@ -17,14 +17,14 @@ Note: databases provide **persistent** storage of information
 In COMP3311 we use:
 
 * PostgreSQL - a full-featured, **client-server** DBMS, which is resource intensive
-  * applications communicate via a server to the database
-  * can run distributed and replicated
-  * follows SQL standard closely, but not totally
-  * has extra data types (e.g. JSON), multiple procedural languages
+    * applications communicate via a server to the database
+    * can run distributed and replicated
+    * follows SQL standard closely, but not totally
+    * has extra data types (e.g. JSON), multiple procedural languages
 * SQLite - a full-featured, **serverless** DBMS, which is a light user of resources
-  * is intended to be embedded in applications
-  * follows SQL standard closely, but not totally
-  * has no stored procedures, JSON, adds functions via programming languages
+    * is intended to be embedded in applications
+    * follows SQL standard closely, but not totally
+    * has no stored procedures, JSON, adds functions via programming languages
 
 ![comparison of dbms architecture](imgs/3-4_dbms-architecture.jpg)
 
