@@ -192,6 +192,20 @@ $ python3 ex1.py
 <connection object at 0xf67186ec; dsn: 'dbname=mydb', closed: 1>
 ```
 
+We can connect to a database using `sqlite3`. Here is a simple script that connects to a database and then closes the connection:
+
+``` python
+import sqlite3
+
+try:
+    conn = sqlite3.connect("mydb.bd")
+    print(conn)     # state of connection after opening
+    conn.close()
+    print(conn)     # state of connection after closing
+except Exception as e:
+    print("Unable to connect to database")
+```
+
 #### Operations on `connection`s
 
 * `cur = conn.cursor()` sets up a handle for performing queries/updates on a database. You must create a `cursor` before performing any database operations
@@ -211,102 +225,109 @@ To set up a cursor called `cur` use `cur = conn.cursor()`
 
 #### Operations on `cursor`s
 
-`cur.execute(SQL_statement, Values)` executes a query.  
+* `cur.execute(SQL_statement, Values)` executes a query.  
 If supplied, it inserts values into the SQL statement, then executes the SQL statement. Results are available via the cursor's fetch methods.
+Example:
 
-Examples:
+    ``` python
+    # run a fixed query
+    cur.execute("select * from R where x=1")
 
-``` python
-# run a fixed query
-cur.execute("select * from R where x=1")
+    # run a query with values inserted
+    cur.execute("select * from R where x = ?", (1,))
+    cur.execute("select * from R where x = ?", [1])
 
-# run a query with values inserted
-cur.execute("select * from R where x = %s", (1,))
-cur.execute("select * from R where x = %s", [1])
+    # run a query stored in a variable
+    query = "select * from tasks where priority=?"
+    pri = 3
+    cur.execute(query, (pri,))
+    ```
 
-# run a query stored in a variable
-query = "select * from Students where name ilike %s"
-pattern = "%mith%"
-cur.execute(query, pattern)
-```
+* `list = cur.fetchall()` gets all answers for a query and stores it in a list of tuples.
+Example:
 
-`cur.mogrify(SQL_statement, Values)` returns the SQL statement as a string with values inserted.  
-It is useful for checking whether `execute()` is doing what you want
+    ``` python
+    import sqlite 3
 
-Examples:
+    con = sqlite3.connect('mydb.db')
+    cur = con.cursor()
+    cur.execute('SELECT name from sqlite_master where type="table"')
+    print(cur.fetchall())
+    con.close()
+    ```
 
-``` python
-query = "select * from R where x = %s"
-print(cur.mogrify(query, [1])
-# Produces: b'select * from R where x = 1'
+* `tup = cur.fetchone()` gets the next result for a query and stores it in a tuple.
+Example:
 
-query = "select * from R where x = %s and y = %s"
-print(cur.mogrify(query, [1,5]))
-# Produces: b'select * from R where x = 1 and y = 5'
-
-query = "select * from Students where name ilike %s"
-pattern = "%mith%"
-print(cur.mogrify(query, [pattern]))
-# Produces: b"select * from Students where name ilike '%mith%'"
-
-query = "select * from Students where family = %s"
-fname = "O'Reilly"
-print(cur.mogrify(query, [fname]))
-# Produces: b"select * from Students where family = 'O''Reilly'"
-```
-
-`list = cur.fetchall()` gets all answers for a query and stores it in a list of tuples.
-
-Examples:
-
-``` python
-# table R contains (1,2), (2,1), ...
-cur.execute("select * from R")
-for tup in cur.fetchall():
-    x,y = tup
-    print(x,y)
-# or print(tup[0],tup[1])
-# prints
-# 1 2
-# 2 1
-# ...
-```
-
-`tup = cur.fetchone()` gets the next result for a query and stores it in a tuple.
-
-Examples:
-
-``` python
-# table R contains (1,2), (2,1), ...
-cur.execute("select * from R")
-while True:
-    t = cur.fetchone()
-    if t == None:
-        break
-        print(x,y)
-# prints
-# 1 2
-# 2 1
-# ...
-```
-
-`tup = cur.fetchmany(nTuples)` gets the next `nTuples` results for a query.  
-It stores the tuples in a list. When there are no results, it returns an empty list
-
-Examples:
-
-``` python
-# table R contains (1,2), (2,1), ...
-cur.execute("select * from R")
-while True:
-    tups = cur.fetchmany(3)
-    if tups == []:
-        break
-        for tup in tups:
-            x,y = tup
+    ``` python
+    # table R contains (1,2), (2,1), ...
+    cur.execute("select * from R")
+    while True:
+        t = cur.fetchone()
+        if t == None:
+            break
             print(x,y)
-# prints
-# 1 2
-# 2 1
-# ...
-```
+    # prints
+    # 1 2
+    # 2 1
+    # ...
+    ```
+
+* `tup = cur.fetchmany(nTuples)` gets the next `nTuples` results for a query.  
+It stores the tuples in a list. When there are no results, it returns an empty list
+Example:
+
+    ``` python
+    # table R contains (1,2), (2,1), ...
+    cur.execute("select * from R")
+    while True:
+        tups = cur.fetchmany(3)
+        if tups == []:
+            break
+            for tup in tups:
+                x,y = tup
+                print(x,y)
+    # prints
+    # 1 2
+    # 2 1
+    # ...
+    ```
+
+* `cur.executemany(SQL_statement, Values)` executes a database operation against all parameter sequences  
+It is handy for operations such as a bulk insert
+Example:
+
+    ``` python
+    import sqlite3
+
+    con = sqlite3.connect('mydb.db')
+    cur = con.cursor()
+    cur.execute('create table if not exists projects(id integer, name text)')
+    data = [(1, "Ridesharing"), (2, "Water Purifying"), (3, "Forensics"), (4, "Botany")]
+    cur.executemany("INSERT INTO projects VALUES(?, ?)", data)
+    con.commit()
+    ```
+
+* `cur.mogrify(SQL_statement, Values)` returns the SQL statement as a string with values inserted.  
+It is useful for checking whether `execute()` is doing what you want
+Example:
+
+    ``` python
+    query = "select * from R where x = %s"
+    print(cur.mogrify(query, [1])
+    # Produces: b'select * from R where x = 1'
+
+    query = "select * from R where x = %s and y = %s"
+    print(cur.mogrify(query, [1,5]))
+    # Produces: b'select * from R where x = 1 and y = 5'
+
+    query = "select * from Students where name ilike %s"
+    pattern = "%mith%"
+    print(cur.mogrify(query, [pattern]))
+    # Produces: b"select * from Students where name ilike '%mith%'"
+
+    query = "select * from Students where family = %s"
+    fname = "O'Reilly"
+    print(cur.mogrify(query, [fname]))
+    # Produces: b"select * from Students where family = 'O''Reilly'"
+    ```
