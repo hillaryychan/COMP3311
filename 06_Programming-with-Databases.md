@@ -274,7 +274,7 @@ Example:
     # ...
     ```
 
-* `tup = cur.fetchmany(nTuples)` gets the next `nTuples` results for a query.  
+* `tup = cur.fetchmany(nTuples)` gets the next `nTuples` results for a query at a time.  
 It stores the tuples in a list. When there are no results, it returns an empty list
 Example:
 
@@ -285,9 +285,9 @@ Example:
         tups = cur.fetchmany(3)
         if tups == []:
             break
-            for tup in tups:
-                x,y = tup
-                print(x,y)
+        for tup in tups:
+            x,y = tup
+            print(x,y)
     # prints
     # 1 2
     # 2 1
