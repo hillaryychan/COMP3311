@@ -266,7 +266,8 @@ Example:
         t = cur.fetchone()
         if t == None:
             break
-            print(x,y)
+        x, y = t
+        print(x,y)
     # prints
     # 1 2
     # 2 1
