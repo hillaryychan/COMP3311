@@ -95,7 +95,7 @@ Consider an instance r(R) of the relation schema R(ABCDE):
 
 Since A values are unique, the definitions of functional dependency gives:  
 `A → B`, `A → C`, `A → D`, `A → E`, or `A → BCDE`  
-Since all E values are the same, it follows that:
+Since all E values are the same, it follows that:  
 `A → E`, `B → E`, `C → E`, `D → E`
 
 Other observations:
@@ -125,7 +125,7 @@ Yes, **rules of inference** allow us to _derive_ dependencies. They allow us to 
 
 _Armstrong's rules_ are general rules of inference on functional dependencies
 
-**F1. Reflexivity** e.g. X → X; a formal statement of trivial dependencies; useful for derivations
+**F1. Reflexivity** e.g. X → X; a formal statement of trivial dependencies; useful for derivations  
 **F2. Augmentation** e.g. X → Y ⇒ XZ → XY; if a dependency holds then we can expand its left hand side (along with the right hand side)  
 **F3. Transivity** e.g. X → Y, Y → Z ⇒ X → Z; the "most powerful" inference rule; useful in multi-step derivations
 
