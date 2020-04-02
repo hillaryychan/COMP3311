@@ -44,10 +44,92 @@ Most texts adopt the following terminology:
 ``` txt
 Attributes              upper-case letters from the start of the alphabet (e.g. A, B, C, ..)
 Sets of attributes      concatenation of attibute names (e.g. X=ABCD, Y=EFG)
-Relation schemas        upper-case letters, denoting a set of all attributes (e.g. R)
+Relation schemas        upper-case letters, denoting a set of all attributes (e.g. R)'
 Relation instances      lower-case letter corresponding to the schema (e.g. r(R))
 Tuples                  lower-case letters (e.g. t, t', t1, u, v)
 Attributes in tuples    tupler[attrSet] (e.g. t[ABCD], t[X])
 ```
 
 ## Functional Dependency
+
+A relation instance r(R) satisfies a dependency X → Y if  
+for any t, u ∈ r, t[X] = u[X] ⇒ t[Y] = u[Y]
+
+In other words, if two tuples in R agree in their values for the set of attributes X, then they must also agree in their values for the set of attributes Y.  
+We say "_Y is functionally dependent on X_"
+
+Attribute sets X and Y may overlap; and trivially it is true that X → X.
+
+Notes:
+
+* X → Y can also be read a s"_X determines Y_"
+* the single arrow → denotes **functional dependency** (_fd_)
+* the double arrow ⇒ denotes logical implication
+
+Consider the following (redundancy-laden) schema:
+
+``` txt
+Title         | Year | Len | Studio    | Star
+--------------+------+-----+-----------+---------------
+King Kong     | 1933 | 100 | RKO       | Fay Wray
+King Kong     | 1976 | 134 | Paramount | Jessica Lange
+King Kong     | 1976 | 134 | Paramount | Jeff Bridges
+Mighty Ducks  | 1991 | 104 | Disney    | Emilio Estevez
+Wayne's World | 1995 | 95  | Paramount | Dana Carvey
+Wayne's World | 1995 | 95  | Paramount | Mike Meyers
+```
+One functional dependencies:  
+`Title Year → Len`, `Title Year → Studio`  
+Not a functional dependency:  
+`Title Year ↛ Star`
+
+Consider an instance r(R) of the relation schema R(ABCDE):
+
+| A   | B   | C   | D   | E   |
+| --- | --- | --- | --- | --- |
+| a1  | b1  | c1  | d1  | e1  |
+| a2  | b1  | c2  | d2  | e1  |
+| a3  | b2  | c1  | d1  | e1  |
+| a4  | b2  | c2  | d2  | e1  |
+| a5  | b3  | c3  | d1  | e1  |
+
+Since A values are unique, the definitions of functional dependency gives:  
+`A → B`, `A → C`, `A → D`, `A → E`, or `A → BCDE`  
+Since all E values are the same, it follows that:
+`A → E`, `B → E`, `C → E`, `D → E`
+
+Other observations:
+
+* combinations of BC are unique, therefore BC → ADE
+* combinations of BD are unique, therefore BD → ACE
+* if C values match, so do D values, therefore C → D
+* however D values do not determine C values so !(D → C)
+
+We could derive many other dependencies; e.g. AE → BC
+
+In practice, we choose the minimal set of _fd_s (basis) from which all other _fd_s can be derived, which captures useful problem-domain information.
+
+More important for design is dependency across all possible instances of the relation (i.e schema-based dependency).  
+This is a simple generalisation of the previous definition  
+for any t, u ∈ **any** r, t[X] = u[X] ⇒ t[Y] = u[Y]  
+such dependencies capture semantics of the problem domain.
+
+Generalising some ideas about functional dependency:
+
+* are there dependencies that hold for _any_ relation?  
+Yes, but they are generally trivial; e.g. Y ⊂ X ⇒ X → Y
+* do some dependencies suggest the existence of others?  
+Yes, **rules of inference** allow us to _derive_ dependencies. They allow us to reason about sets of functional dependencies
+
+## Inference Rules
+
+_Armstrong's rules_ are general rules of inference on functional dependencies
+
+**F1. Reflexivity** e.g. X → X; a formal statement of trivial dependencies; useful for derivations
+**F2. Augmentation** e.g. X → Y ⇒ XZ → XY; if a dependency holds then we can expand its left hand side (along with the right hand side)  
+**F3. Transivity** e.g. X → Y, Y → Z ⇒ X → Z; the "most powerful" inference rule; useful in multi-step derivations
+
+Armstrong's rules are complete, but other useful rules exist:  
+**F4. Additivity**  
+**F5. Projectivity**  
+**F6. Pseudotransitivity**  
