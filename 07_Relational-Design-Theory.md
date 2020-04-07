@@ -78,6 +78,7 @@ Mighty Ducks  | 1991 | 104 | Disney    | Emilio Estevez
 Wayne's World | 1995 | 95  | Paramount | Dana Carvey
 Wayne's World | 1995 | 95  | Paramount | Mike Meyers
 ```
+
 One functional dependencies:  
 `Title Year → Len`, `Title Year → Studio`  
 Not a functional dependency:  
@@ -121,7 +122,7 @@ Yes, but they are generally trivial; e.g. Y ⊂ X ⇒ X → Y
 * do some dependencies suggest the existence of others?  
 Yes, **rules of inference** allow us to _derive_ dependencies. They allow us to reason about sets of functional dependencies
 
-## Inference Rules
+### Inference Rules
 
 _Armstrong's rules_ are general rules of inference on functional dependencies
 
@@ -130,6 +131,363 @@ _Armstrong's rules_ are general rules of inference on functional dependencies
 **F3. Transivity** e.g. X → Y, Y → Z ⇒ X → Z; the "most powerful" inference rule; useful in multi-step derivations
 
 Armstrong's rules are complete, but other useful rules exist:  
-**F4. Additivity**  
-**F5. Projectivity**  
-**F6. Pseudotransitivity**  
+**F4. Additivity** e,g, X → Y, X → Z ⇒ X → YZ; useful for constructing new right hand sides of functional dependencies (also called **_union_**)  
+**F5. Projectivity** e.g X → YZ ⇒ X → Y, X → Z; useful for reducing right hand sides of functional dependencies (also called **_decomposition_**  
+**F6. Pseudotransitivity** e.g. X → Y, YZ → W ⇒ XZ → W; shorthand for common transitivity derivation  
+
+Example: determining validity of AB → GH, given:  
+
+``` txt
+R = ABCDEFGHIJ
+F = { AB → E, AG → J, BE → I, E → G, GI → H }
+Derivation:
+AB → E  (given)
+E  → G  (given)
+AB → G  (using F3 on 1,2)
+AB → AB (using F1)
+AB → B  (using F5 on 4)
+AB → BE (using F4 on 1,5)
+BE → I  (given)
+AB → I  (using F3 on 6,7)
+AB → GI (using F4 on 3,8)
+GI → H  (given)
+AB → H  (using F3 on 9,10)
+AB → GH (using F4 on 3,11)
+```
+
+### Closures
+
+For a finite set of attributes, there must be a finite set of derivable functional dependencies.
+
+The largest collection of dependencies that can be derived from F is called the **closure of F** and is denoted F+ (F^+).
+
+Closures allow us to answer two interesting questions:
+
+* Is a particular dependency X → Y derivable from F?  
+Compute the closure F+ and check whether X → Y ∈ F +
+* Are two sets of dependencies F and G equivalent?  
+Compute closures F+ and G+ and check whether they are equal
+
+Unfortunately closres can be very large e.g.  
+R = ABC, F = { AB → C, C → B }  
+F+ = { A → A, AB → A, AC → A, AB → B, BC → B, ABC → B, C → C, AC → C, BC → C, ABC → C, AB → AB, . . . . . . , AB → ABC, AB → ABC, C → B, C → BC, AC → B, AC → AB }
+
+Algorithms based on F+ rapidly become infeasible.  
+To solve this problem, use closures based on **sets of attributes** rather than sets of functional dependencies.
+
+Given a set X of attributes and a set F of functional dependencies, the **closure of X** (denotes X+ (X^+)) is the largest set of attributes that can be derived from X using F.
+
+We can prove (using additivity) that (X → Y) ∈ F+ iff Y ⊂ X+
+
+For computation, |X+| is bounded by the number of attributes
+
+So, for the questions we asked earlier:
+
+* For the question "is X → Y derivable from F?"  
+Compute the closure X+ , check whether Y ⊂ X+
+* For the question "are F and G equivalent?"  
+For each dependency in G, check whether it is derivable from F
+For each dependency in F, check whether it is derivable from G
+If it is true for all, then F ⇒ G and G ⇒ F which implies F+ = G+
+* For the question "what are the keys of R implied by F?  
+Find subsets K ⊂ R such that K+ = R
+_a key is a set of attributes that can uniquely determine the values of R_
+
+## Normalisation
+
+**Normalisations** is a branch of relational theory providing design insights
+
+The goal of normalisation is:
+
+* be able to characterise the **level of redundancy** in a relational schema
+* provide mechanisms for transforming schemas to remove redundancy
+
+Normalisation draws heavily on the theory of functional dependencies
+
+### Normal Forms
+
+Normalisation theory defines _six normal forms_ (NFs):
+
+* First, Second, Third Normal Forms (1NF, 2NF, 3NF) (Codd 1972)
+* Boyce-Codd Normal Form (BCNF) (1974)
+* Fourth Normal Form (4NF) (Zaniolo 1976, Fagin 1977)
+* Fifth Normal Form (5NF) (Fagin 1979)
+
+NF hierarchy: 5NF ⇒ 4NF ⇒ BCNF ⇒ 3NF ⇒ 2NF ⇒ 1NF
+
+We say that a "schema is in xNF" which tells us something about the level of redundancy in the schema  
+1NF allows the most redundancy; 5NF allows least redundancy.  
+For most practical purposes, BCNF (or 3NF) are acceptable NFs
+
+* **1NF** - all attributes have atomic values; we assume this as part of relational model, so every relation schema is in 1NF
+* **2NF** - all non-key attributes full depend on key (i.e. no partial dependencies); avoids much redundancy
+* **3NF/BCNF** - no attributes dependent on non-key attributes (i.e. no transitive dependences); avoid most remaining redundancy
+
+Normalisations aim to put a schema into xNF by ensuring that all relations in the schema are in xNF.
+
+How normalisation works:
+
+1. decide which normal form xNF is "acceptable" (i.e. how much redundancy are we willing to tolerate)
+2. check whether each relation in the schema is in xNF
+3. if a relation is not in xNF, _partition_ inot sub-relations where each is "closer to " xNF
+4. repeat until all relations in the schema are in xNF
+
+In practice, BCNF and 3NF are the most important.
+
+Boyce-Codd Normal Form (BCNF) eliminates all redundancy due to functional dependencies, but may not preserve original functional dependencies  
+Third Normal Form (3NF) eliminates most (but not all) redundancy due to functional dependencies and is guaranteed to preserve all functional dependencies
+
+### Relation Decomposition
+
+The standard transformation technique to remove redundancy is to **decompose** relation R into relations S and T.
+
+We accomplish decomposition by selecting (overlapping) subsets of attributes forming new relations based on attribute subsets.
+
+Properties R = S ∪ T, S ∩ T ≠ ∅ and r(R) = s(S) ⋈ t(T)
+
+It may require several decompositions to achieve acceptable NF  
+Normalisation algorithms tell us how to choose S and T
+
+### Schema (Re)Design
+
+Consider the following relation for BankLoans
+
+``` txt
+branchName | branchCity  | assets  | custName  | loanNo | amount
+-----------+-------------+---------+-----------+--------+-------
+Downtown   | Brooklyn    | 9000000 | Jones     | L-17   | 1000
+Redwood    | Palo Alto   | 2100000 | Smith     | L-23   | 2000
+Perryridge | Horseneck   | 1700000 | Hayes     | L-15   | 1500
+Downtown   | Brooklyn    | 9000000 | Jackson   | L-15   | 1500
+Mianus     | Horseneck   | 400000  | Jones     | L-93   | 500
+Round Hill | Horseneck   | 8000000 | Turner    | L-11   | 900
+North Town | Rye         | 3700000 | Hayes     | L-16   | 1300
+```
+
+This schema has all of the update anomalies mentioned earlier.
+
+To improve the design, decompose the BankLoans relation.
+
+The following decomposition is not helpful because we lose information (such as which branch is a loan held at)
+
+``` txt
+Branch(branchName, branchCity, assets)
+CustLoan(custName, loanNo, amount)
+```
+
+Another possible decomposition is:
+
+``` txt
+Branch(branchName, branchCity, assets, custName)
+CustLoan(custName, loanNo, amount)
+```
+
+``` txt
+The BranchCust relation instance
+branchName | branchCity  | assets  | custName
+-----------+-------------+---------+---------
+Downtown   | Brooklyn    | 9000000 | Jones
+Redwood    | Palo Alto   | 2100000 | Smith
+Perryridge | Horseneck   | 1700000 | Hayes
+Downtown   | Brooklyn    | 9000000 | Jackson
+Mianus     | Horseneck   | 400000  | Jones
+Round Hill | Horseneck   | 8000000 | Turner
+North Town | Rye         | 3700000 | Hayes
+
+The CustLoan relation instance:
+ custName  | loanNo | amount
+-----------+--------+-------
+ Jones     | L-17   | 1000
+ Smith     | L-23   | 2000
+ Hayes     | L-15   | 1500
+ Jackson   | L-15   | 1500
+ Jones     | L-93   | 500
+ Turner    | L-11   | 900
+ Hayes     | L-16   | 1300
+```
+
+Now consider the result of `BranchCust join CustLoan`
+
+``` txt
+branchName | branchCity  | assets  | custName  | loanNo | amount
+-----------+-------------+---------+-----------+--------+-------
+Downtown   | Brooklyn    | 9000000 | Jones     | L-17   | 1000
+Downtown   | Brooklyn    | 9000000 | Jones     | L-93   | 500
+Redwood    | Palo Alto   | 2100000 | Smith     | L-23   | 2000
+Perryridge | Horseneck   | 1700000 | Hayes     | L-15   | 1300
+Perryridge | Horseneck   | 1700000 | Hayes     | L-16   | 1500
+Downtown   | Brooklyn    | 9000000 | Jackson   | L-15   | 1500
+Mianus     | Horseneck   | 400000  | Jones     | L-93   | 500
+Mianus     | Horseneck   | 400000  | Jones     | L-17   | 100
+Round Hill | Horseneck   | 8000000 | Turner    | L-11   | 900
+North Town | Rye         | 3700000 | Hayes     | L-16   | 1300
+North Town | Rye         | 3700000 | Hayes     | L-17   | 1500
+```
+
+This is clearly not a successful decomposition. The fact that we ended up with extra tuples was symptomatic of losing some critical "connection" information during the decomposition.  
+Such a decomposition is called **lossy decomposition**
+
+In a good decomposition, we should be able to reconstruct the original relation exactly: _if R is decomposed into S and T,, then Join(S,T)=R_  
+Such a decomposition is called **lossless join decomposition**
+
+### Boyce-Codd Normal Form
+
+A relation schema R is in BCNF w.r.t a set F of functional dependencies iff:  
+For all functional dependencies X → Y in F+:
+
+* either X → Y is trivial (i.e. Y ⊂ X)
+* or X is a superkey (i.e. non-strict superset of attributes in key)
+
+A database schema is in BCNF if all of its relation schemas are in BCNF.
+
+Observations:
+
+* any two-attribute relation is in BCNF
+* any relation with key K, other attributes Y and K → Y is in BCNF
+
+If we transform a schema into BCNF, we are **guaranteed**:
+
+* no update anomalies due to functional dependency-based redundancy
+* lossless join decomposition
+
+However we are **not guaranteed** the new schema preserves all functional dependencies from the original schema.  
+This may be a problem if the functional dependencies contain significant semantic information about the problem domain. If we need to preserve dependencies, use 3NF.
+
+A dependency X → Y is not preserved if, for example, X =ABC and ABC are in relation R, after decomposition into S and T, AB is in S and BC is in T
+
+#### BCNF Decomposition
+
+The following algorithm converts an arbitrary schema into BCNF:
+
+``` txt
+Inputs: schema R, set F of fds
+Output: set Res of BCNF schemas
+
+Res = {R};
+while (any schema S ∈ Res is not in BCNF) {
+    choose any fd X → Y on S that violates BCNF
+    Res = (Res-S) ∪ (S-Y) ∪ XY
+}
+```
+
+The last step means: make a table from XY; drop Y from table S  
+The "choose any" step means that the algorithm is non-deterministic
+
+Example: the BankLoans schema  
+`BankLoans(branchNAme, branchCity, assets, custName, loanNo, amount)`  
+has functional dependencies F:
+
+* `branchName → assets, branchCity`
+* `loanNo → amount, branchName`
+
+The key for `BankLoans` is `branchNAme, custName, loanNo`
+
+Applying the BCNF algorithm:
+
+* check `BankLoans` relation - it is not in BCNF  
+(`branchName → assets,branchCity` violates BCNF criteria; LHS is not a key)
+* to fix - decompose `BankLoans` into  
+`Branch(branchName, branchCity, assets)`
+`LoanInfo(branchName, custName, loanNo, amount)`
+* check `Branch` relation - it is in BCNF (the only nontrivial fd has LHS=branchName, which is a key)
+* check `LoanInfo` relation - it is not in BCNF  
+(`loanNo → amount,branchName `violates BCNF criteria; LHS is not a key)
+* to fix - decompose `LoanInfo` into  
+`Loan(branchName, loanNo, amount)`
+`Borrower(custName, loanNo)`
+* check Loan - it is in BCNF
+* check Borrower - it is in BCNF
+
+Overall schemas:
+
+``` txt
+Branch(branchName, branchCity, assets)
+Loan(branchName, loanNo, amount)
+Borrower(custName, loanNo)
+```
+
+Notes:
+For `Branch`: key = `branchname`, FDs are `branchName → assets,branchCity`
+For `LoanInfo`: key = `loanNo,custName`, FDs are `loanNo → amount,branchName`
+
+### Third Normal Form
+
+A relation schema R is in 3NF w.r.t a set of F of functional dependencies iff:  
+For all functional dependencies X → Y in F+:
+
+* either X → Y is trivial (i.e. Y ⊂ X)
+* or X is a superkey (i.e. non-strict superset of attributes in key)
+* or Y is single attribute from a key
+
+A database schema is in 3NF if all relation schemas are in 3NF
+
+If we transform a schema into 3NF, we are **guaranteed**:
+
+* lossless join decomposition
+* the new schema preserves all of the functional dependencies from the original schema
+
+However, we are **not guaranteed** that no update anomalies are due to functional dependency-based redundancy
+
+Whether to use BCNF or 3NF depends on overall design considerations
+
+### 3NF Decomposition
+
+The following algorithm converts an arbitrary schema to 3NF:
+
+``` txt
+Inputs: schema R, set F of fds
+Output: set R i of 3NF schemas
+
+let Fc be a minimal cover for F
+Res = {}
+for each fd X → Y in Fc {
+    if (no schema S ∈ Res contains XY) {
+        Res = Res ∪ XY
+    }
+}
+if (no schema S ∈ Res contains a candidate key for R) {
+    K = any candidate key for R
+    Res = Res ∪ K
+}
+```
+
+The critical step is producing minimal cover Fc for F
+
+A set F of fds is minimal if
+* every fd X → Y is simple  
+(Y is a single attribute)
+* every fd X → Y is left-reduced  
+(no Z ⊂ X such that Z → A could replace X → A in F and preserve F + )
+* every fd X → Y is necessary  
+(no X → Y can be removed without changing F + )
+
+Algorithm: right-reduce, left-reduce, eliminate redundant fds
+
+Example: consider the schema R and set of functional dependencies F  
+`R = ABCDEFGH`  
+`F = Fc = { BH → C, A → D, C → E, F → A, E → F, BGH → E }`
+
+The key is `BGH` (or `BF` or ...)
+
+The schema will be decomposed into relations containing:
+
+``` txt
+ABHC
+AD
+CE
+AF
+EF
+BEGH
+```
+
+At least one of these includes the key (`BGH`)  
+If they key was `BF`, then we'd need to make an extra table `BF`
+
+## Database Design Methodology
+
+To achieve a "good" database design:
+
+* identify attributes, entities, relationships (ER design)
+* map ER design to relational schema
+* identify constraints (including keys and functional dependencies)
+* apply BCNF/3NF algorithms to produce normalised schema
