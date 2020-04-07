@@ -465,7 +465,7 @@ Algorithm: right-reduce, left-reduce, eliminate redundant fds
 
 Example: consider the schema R and set of functional dependencies F  
 `R = ABCDEFGH`  
-`F = Fc = { BH → C, A → D, C → E, F → A, E → F, BGH → E }`
+`F = Fc = { ABH → C, A → D, C → E, F → A, E → F, BGH → E }`
 
 The key is `BGH` (or `BF` or ...)
 
