@@ -491,3 +491,5 @@ To achieve a "good" database design:
 * map ER design to relational schema
 * identify constraints (including keys and functional dependencies)
 * apply BCNF/3NF algorithms to produce normalised schema
+
+Note: may subsequently need to "denormalise" if the design yields inadequate performance
