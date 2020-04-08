@@ -11,3 +11,4 @@
 5. [More PLpgSQL](https://github.com/hillaryychan/COMP3311/blob/master/05_More-PLpgSQL.md)
 6. [Programming with Databases](https://github.com/hillaryychan/COMP3311/blob/master/06_Programming-with-Databases.md)
 7. [Relational Design Theory](https://github.com/hillaryychan/COMP3311/blob/master/07_Relational-Design-Theory.md)
+8. [Relational Algebra](https://github.com/hillaryychan/COMP3311/blob/master/08_Relational-Algebra.md)
