@@ -345,6 +345,9 @@ Division handles queries that include the notion "for all"; e.g. Which beers are
 
 We can answer this as follows:
 
-1. generate a relation of beers and bars, where they are sold; `r1 = Proj[beer,bar](Sold)`
-2. generate a relation of all bars; `r2 = Rename[r2(bar)](Proj[name](Bars))`
-3. find which bars appear in tuples in every bar; `res = r1 Div r2`
+1. generate a relation of beers and bars, where they are sold;  
+`r1 = Proj[beer,bar](Sold)`
+2. generate a relation of all bars;  
+`r2 = Rename[r2(bar)](Proj[name](Bars))`
+3. find which bars appear in tuples in every bar;  
+`res = r1 Div r2`
