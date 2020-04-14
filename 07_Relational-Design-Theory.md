@@ -108,7 +108,7 @@ Other observations:
 
 We could derive many other dependencies; e.g. AE → BC
 
-In practice, we choose the minimal set of _fd_s (basis) from which all other _fd_s can be derived, which captures useful problem-domain information.
+In practice, we choose the minimal set of _fd_ s (basis) from which all other _fd_ s can be derived, which captures useful problem-domain information.
 
 More important for design is dependency across all possible instances of the relation (i.e schema-based dependency).  
 This is a simple generalisation of the previous definition  
