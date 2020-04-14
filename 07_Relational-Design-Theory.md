@@ -368,6 +368,11 @@ while (any schema S ∈ Res is not in BCNF) {
     choose any fd X → Y on S that violates BCNF
     Res = (Res-S) ∪ (S-Y) ∪ XY
 }
+
+English equivalent:
+for schemas S that doesn't satisfy BCNF
+    choose a fd X → Y
+    create two new schemas; S-Y, XY
 ```
 
 The last step means: make a table from XY; drop Y from table S  
@@ -449,6 +454,10 @@ if (no schema S ∈ Res contains a candidate key for R) {
     K = any candidate key for R
     Res = Res ∪ K
 }
+
+English equivalent:
+create a schema for each fd
+if the key does not exist in any of the schema, make it a schema
 ```
 
 The critical step is producing minimal cover Fc for F
