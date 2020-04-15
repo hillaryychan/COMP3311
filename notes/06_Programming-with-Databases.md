@@ -30,7 +30,7 @@ The distance between programming languages and DBMS is variable; e.g. `libpq` al
 
 Programming Language/DBMS architecture:
 
-![pl-dbms-architecture](imgs/7-11_pl-dbms-architecture.png)
+![pl-dbms-architecture](../imgs/7-11_pl-dbms-architecture.png)
 
 ## PL/DB Interface
 
@@ -154,7 +154,7 @@ In order to use Psycopg2 in a python program `import psycopg2` (assuming the mod
 
 Where `psycopg2` fits in the PL/DB architecture:
 
-![psycopg2 in pldb architecture](imgs/7-22_psycopg2-pldb-architecture.png)
+![psycopg2 in pldb architecture](../imgs/7-22_psycopg2-pldb-architecture.png)
 
 ### Database `connection`s
 

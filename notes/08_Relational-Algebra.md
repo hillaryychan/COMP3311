@@ -24,7 +24,7 @@ Common extension include: _aggregations_, _projection++_, _division_
 
 Select, project, join provide a powerful set of operations for building relations and extracting interesting data from them.
 
-![relational algebra operations](imgs/9-4_ra-operations.png)
+![relational algebra operations](../imgs/9-4_ra-operations.png)
 
 Adding set operations and renaming make relational algebra _complete_
 
@@ -33,7 +33,7 @@ Adding set operations and renaming make relational algebra _complete_
 Standard treatments of relational algebra use Greek symbols.  
 We will use the following notation (because it is easier to reproduce)
 
-![notation](imgs/9-5_notation.png)
+![notation](../imgs/9-5_notation.png)
 
 For other operations (e.g. set operations) we adopt the standard notation  
 Except when typing in a text file, where `*`=intersection and `+`=union
@@ -63,7 +63,7 @@ Each "intermediate result" has a well-defined schema.
 
 When explaining RA operations, we will use the following relations as examples:
 
-![RA example relations](imgs/9-8_ra-eg-relations.jpg)
+![RA example relations](../imgs/9-8_ra-eg-relations.jpg)
 
 ## Rename
 
@@ -113,7 +113,7 @@ for each tulpe t in relation r
 
 Examples of selection:
 
-![Selection Example](imgs/9-13_selection-example.png)
+![Selection Example](../imgs/9-13_selection-example.png)
 
 Querying with relational algebra (selection):
 
@@ -147,7 +147,7 @@ for each tuple t in relation r
 
 Examples of projection:
 
-![Projection Example](imgs/9-16_projection-example.png)
+![Projection Example](../imgs/9-16_projection-example.png)
 
 Querying with relational algebra (projection):
 
@@ -194,7 +194,7 @@ for each tuple t in relation r1
 
 Example of union and intersection:
 
-![Union and Intersection Example](imgs/9-20_union-intersection-example.png)
+![Union and Intersection Example](../imgs/9-20_union-intersection-example.png)
 
 Querying with relational algebra (set operations):
 
@@ -227,7 +227,7 @@ for each tuple t in relation r1
 
 Example of difference:
 
-![Difference Example](imgs/9-23_difference-example.png)
+![Difference Example](../imgs/9-23_difference-example.png)
 
 You can see the result of the differences are **not symmmetric**
 
@@ -267,7 +267,7 @@ result = {}
 
 Example of product:
 
-![Product Example](imgs/9-26_product-example.png)
+![Product Example](../imgs/9-26_product-example.png)
 
 ## Joins
 
@@ -290,7 +290,7 @@ for each tuple t1 in relation r
 
 Example of natural join
 
-![Natural Join Example](imgs/9-28_natural-join-example.png)
+![Natural Join Example](../imgs/9-28_natural-join-example.png)
 
 **_Theta join_** is a specialised product containing only pairs that match on a supplied condition C
 
@@ -302,7 +302,7 @@ Can be defined in terms of other RA operations: `r ⋈ C s = r Join[C] s = Sel[C
 
 Example of theta join:
 
-![Theta Join Example](imgs/9-30_theta-join-example.png)
+![Theta Join Example](../imgs/9-30_theta-join-example.png)
 
 (Theta join is the most frequently used join in SQL queries)
 
@@ -337,7 +337,7 @@ Operationally:
 
 Example of division:
 
-![Division Example](imgs/9-33_division-example.png)
+![Division Example](../imgs/9-33_division-example.png)
 
 Querying with relational algebra (division):
 

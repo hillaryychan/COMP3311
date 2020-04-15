@@ -11,7 +11,7 @@ In database design **redundancy** is generally a "bad thing" since it causes pro
 
 Consider the following relation defining bank accounts/branches.
 
-![Redundancy](imgs/8-4_redundancy.jpg)
+![Redundancy](../imgs/8-4_redundancy.jpg)
 
 We have the following issues in the relation above:
 

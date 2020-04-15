@@ -12,7 +12,7 @@ Data modelling is a design process that converts requirements into a data model.
 
 The strategy is to design using an abstract/logical model and then map to a physical model
 
-![modelling strategy](imgs/1-30_model-strategy.png)
+![modelling strategy](../imgs/1-30_model-strategy.png)
 
 We can to consider the following when we design models:
 
@@ -62,11 +62,11 @@ Note that when discussing 'entity sets', we often just call them 'entities'
 
 Here are specific visual symbols used to indicate different ER design elements:
 
-![ER symbols](imgs/1-36_ER-symbols.png)
+![ER symbols](../imgs/1-36_ER-symbols.png)
 
 Examples of ER diagrams:
 
-![ER examples](imgs/1-37_ER-examples.jpg)
+![ER examples](../imgs/1-37_ER-examples.jpg)
 
 #### Entity Sets
 
@@ -85,11 +85,11 @@ A **relationship set** is a collection of relationships of the same type
 
 The **degree** of a relationship is the  of entities involved in the relationship
 
-![ER degree](imgs/1-43_ER_degree.png)
+![ER degree](../imgs/1-43_ER_degree.png)
 
 The **cardinality** of a relationship is the  of associated entities on each side of the relationship
 
-![ER cardinality](imgs/1-44_ER-cardinality.png)
+![ER cardinality](../imgs/1-44_ER-cardinality.png)
 
 The **level of participation constraint** in a relation constrain can be defined as:  
 The participation in a relationship set **R** by and entity set **A** may be
@@ -98,18 +98,18 @@ The participation in a relationship set **R** by and entity set **A** may be
 * **partial** - only some _a_ ∈ _A_ participates in relationships in **R**
 
 E.g every bank loan is taken out by at least one customer, but not every customer has a bank loan
-![ER participation](imgs/1-42_ER_participation.png)
+![ER participation](../imgs/1-42_ER_participation.png)
 
 In some cases, a relationship needs associated attributes
 
-![Relationshp attributes](imgs/1-45_relationship-attr.png)
+![Relationshp attributes](../imgs/1-45_relationship-attr.png)
 
 #### Weak Entity Sets
 
 A **weak entity** exists only because of an association with strong entities; it cannot exist without the strong entities it is associated with.  
 They do not have key of their own, but they do have a **descriminator** which is denoted using a dotted underline or the same symbol as a derived attributes. Weak entities are are always totally participant in a relationship.
 
-![Weak entity](imgs/1-48_weak-entity.png)
+![Weak entity](../imgs/1-48_weak-entity.png)
 
 #### Subclasses and Inheritance
 
@@ -127,11 +127,11 @@ Disjoint inheritance: the entity is must be one or the other but not both
 Partial participation does not have to be who inherits it.
 Total participation means you cannot be the parent
 
-![subclasses](imgs/1-50_ER-subclasses.png)
+![subclasses](../imgs/1-50_ER-subclasses.png)
 
 A special case of inheritance is when an entity has **one subclass**; i.e "B _is a_ A" specialisation"
 
-![specialisation subclass](imgs/1-49_ER-specialisation-subclass.png)
+![specialisation subclass](../imgs/1-49_ER-specialisation-subclass.png)
 
 ### Design Using the ER Model
 
@@ -147,7 +147,7 @@ Answers to the above are worked out by _thinking_ about the application domain
 
 For example: we have two ways to represent "a person has some types of foods that they like"
 
-![person-likes-food](imgs/1-52_person-likes-food.png)
+![person-likes-food](../imgs/1-52_person-likes-food.png)
 
 The option you choose depends on how you want to represent your food.  
 Will it have attributes such as its ingredients and other operations done on the attributes? Then the second option is better. Do we only want to the food name and nothing else? Then the first option is better.  
@@ -184,11 +184,11 @@ A tuple (row) is a set of values (attribute or column values). Attribute values:
 * are **atomic** (there are no composite or multi-valued attributes). Derived attributes do not need to be modelled in a relational model
 * belong to a **domain**, which has a name, data type and format. A distinguished `NULL` value belongs to all domains. A `NULL` has several interpretations; none, don't know, irrelevant
 
-![Eample tuple](imgs/1-60_example-tuple.png)
+![Eample tuple](../imgs/1-60_example-tuple.png)
 
 A **relation (table)** is a set of tuples. Since a relation is a set, there is **no ordering** of rows. Normally we define a standard ordering on components of a tuple. The following are different representations of the same relation:
 
-![Example relation](imgs/1-60_example-relation.png)
+![Example relation](../imgs/1-60_example-relation.png)
 
 Each relation generally has a primary key (a subset of attributes, unique over the relation).
 
@@ -196,13 +196,13 @@ A database is a set of relations (tables)
 
 ### Expressing a Relational Data Model Mathematically
 
-![Mathematical representation of relational model](imgs/1-62_relation-math-model.png)
+![Mathematical representation of relational model](../imgs/1-62_relation-math-model.png)
 
 Note: tuples (2,3) ≠ (3,2) but relation: {(a,b), (c,d)} = {(c,d), (a,b)}
 
 Examples of ER data models, a relation schema and relation instance
 
-![ER to schema to instance](imgs/2-4_er-schema-instance.jpg)
+![ER to schema to instance](../imgs/2-4_er-schema-instance.jpg)
 
 ### Integrity Constraints
 
@@ -224,7 +224,7 @@ e.g. `Class(...,Mon,2pm,Lyre)` is well-defined but `Class(...,NULL,2pm,Lyre,...)
     * the attributes in F correspond to the primary key of R2
     * the value of F in each tuple of R1 either occurs as a primary key in R2 or is entirely `NULL`
 
-![referential integrity constraints](imgs/2-9_ref-integrity-constraint.png)
+![referential integrity constraints](../imgs/2-9_ref-integrity-constraint.png)
 
 Foreign keys are critical in relational databases because they provide:
 
@@ -338,13 +338,13 @@ The differences between relational and ER models is:
 
 An entity set E with atomic attributes a1, a2, ..., an maps to a relations R with attributes (columns) a1, a2, ..., an.
 
-![Map strong entities](imgs/2-19_map-strong-entities.png)
+![Map strong entities](../imgs/2-19_map-strong-entities.png)
 
 Note that the key is preserved in the mapping.
 
 ### Mapping Weak Entities
 
-![Map weak entities](imgs/2-20_map-weak-entities.png)
+![Map weak entities](../imgs/2-20_map-weak-entities.png)
 
 Note that the primary key of the strong entity and the descriminator in the weak entity combine to form the primary key of the weak entity.
 
@@ -352,13 +352,13 @@ Note that the primary key of the strong entity and the descriminator in the weak
 
 Many-to-many relationships can be mapped to a new relation, where the primary keys of entities involved in the relationship are foreign keys in this relations.
 
-![Map N:M relationship](imgs/2-21_map-nm-rel.png)
+![Map N:M relationship](../imgs/2-21_map-nm-rel.png)
 
 ### Mapping 1:N Relationships
 
 A one-to-many relationship can be mapped by having more values in one entity ~~or by mapping to a new relation.~~
 
-![Map 1:N relationship](imgs/2-22_map-1n-rel.jpg)
+![Map 1:N relationship](../imgs/2-22_map-1n-rel.jpg)
 
 **Be wary about the correctness of your mappings.**
 
@@ -372,13 +372,13 @@ When mapping one-to-one relationships, you will add relationship data to one ent
 
 If one entity is totally participant in the relationship, the relationship data should be added to that entity. Otherwise we won't be able to _enforce_ the concept of total participation as we won't know whether all tuples have been used.
 
-![Map 1:1 relationship](imgs/2-25_map-11-rel.png)
+![Map 1:1 relationship](../imgs/2-25_map-11-rel.png)
 
 If we stored `empNo` in Branch, some branches will have `NULL` values in `empNo` since it is not compulsory for the branch to have a manager. On the other hand, the manager relation will always have a value for its `branchNo`
 
 If there is no reason to favour one side of the relationship, it does not matter where the relationship data is placed.
 
-![Map 1:1 relationship equal participation](imgs/2-27_map-11-rel-equal-participation.png)
+![Map 1:1 relationship equal participation](../imgs/2-27_map-11-rel-equal-participation.png)
 
 ### Mapping n-way Relationships
 
@@ -396,7 +396,7 @@ Some people advocate converting n-way relationships into a new entity and a set 
 
 Composite values can be stored as a single concatenated attribute or separate values.
 
-![Map composite values](imgs/2-32_map-composite-values.png)
+![Map composite values](../imgs/2-32_map-composite-values.png)
 
 The first version has the advantage of being simpler and is useful if you don't intend to query or search the value.  
 The second version has the advantage of being able to searched easily and precisely.
@@ -405,7 +405,7 @@ The second version has the advantage of being able to searched easily and precis
 
 Multi-valued attributes are mapped by a new table linking values to their entity.
 
-![Map multi-value attributes](imgs/2-33_map-mva.jpg)
+![Map multi-value attributes](../imgs/2-33_map-mva.jpg)
 
 ``` sql
 -- the two entities
@@ -431,7 +431,7 @@ There are three different approaches to mapping subclasses to tables
 
 Which mapping is best depends on how the data is used
 
-![Map subclass](imgs/2-38_map-subclass.jpg)
+![Map subclass](../imgs/2-38_map-subclass.jpg)
 
 The different mappings also capture different aspects of subclasses:
 

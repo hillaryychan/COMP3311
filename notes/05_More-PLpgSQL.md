@@ -137,7 +137,7 @@ Note: `OLD` does not exist for insertion and `NEW` does not exist for deletion.
 
 Sequence of activities during database update:
 
-![database activity sequence](imgs/5-22_datavase-activity-sequence.png)
+![database activity sequence](../imgs/5-22_datavase-activity-sequence.png)
 
 Reminder: `BEFORE` can modify the value of a new tuple
 
@@ -499,7 +499,7 @@ return makeFinal(State)
 
 Aggregates are commonly used with `GROUP BY`. In that context, the "summarise" each group.
 
-![aggregate group by](imgs/5-47_aggregate-group-by.png)
+![aggregate group by](../imgs/5-47_aggregate-group-by.png)
 
 ### User-defined Aggregates
 

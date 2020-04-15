@@ -26,7 +26,7 @@ In COMP3311 we use:
     * follows SQL standard closely, but not totally
     * has no stored procedures, JSON, adds functions via programming languages
 
-![comparison of dbms architecture](imgs/3-4_dbms-architecture.jpg)
+![comparison of dbms architecture](../imgs/3-4_dbms-architecture.jpg)
 
 ### Using PostgreSQL on CSE
 
@@ -466,7 +466,7 @@ An example covering most SQL topics:
 
 We have the ER design for a beer database and its corresponding relational model:
 
-![beer databse](imgs/3-42_beer-database.jpg)
+![beer databse](../imgs/3-42_beer-database.jpg)
 
 Find the queries that can be used to answer the following questions on the beer database:
 

@@ -34,7 +34,7 @@ According to the Elmasri/Navathe textbook,
 
 ## Overview of the Database Field
 
-![overview of the database field](imgs/1-25_overview-of-database-field.png)
+![overview of the database field](../imgs/1-25_overview-of-database-field.png)
 
 Database application development is variation on standard software engineering process:
 
@@ -51,6 +51,6 @@ At some point, populate the database (maybe via the interface)
 
 The typical environment for a typical DBMS is:
 
-![typical modern DBMS](imgs/1-27_database-system-architecture.png)
+![typical modern DBMS](../imgs/1-27_database-system-architecture.png)
 
 SQL queries and results travel along the client-server links

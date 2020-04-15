@@ -60,7 +60,7 @@ $$ LANGUAGE funcDefLanguage;
 
 The PLpgSQL interpreter executes procedural code and manages variables. It calls PostgreSQL engine to evaluate SQL statements.
 
-![postgresql engine](imgs/4-19_postgresql-engine.png)
+![postgresql engine](../imgs/4-19_postgresql-engine.png)
 
 ### Function Return Types
 

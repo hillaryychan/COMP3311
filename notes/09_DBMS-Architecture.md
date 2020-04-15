@@ -14,20 +14,20 @@ As a programmer you give up a lot of control to the DBMS, but you can use
 
 So far we have viewed a DBMS as a machine that processes SQL queries
 
-![high level view of DBMS](imgs/9-37_high-level-DBMS.png)
+![high level view of DBMS](../imgs/9-37_high-level-DBMS.png)
 
 One view of a database engine is a **_relational algebra virtual machine_** for operation; selection, projection, join, union, intersection, difference, sort, insert, delete.  
 For each of these operations various data structures and algorithms are available. The DBMS may provide only one, or provide a choice.
 
 Layers in a database engine (Ramakrishnan's View)
 
-![Layers in db engine](imgs/9-39_layers-in-db-engine.png)
+![Layers in db engine](../imgs/9-39_layers-in-db-engine.png)
 
 ## Query Evaluation
 
 The path of a query through its evaluation:
 
-![query path](imgs/9-40_query-path.png)
+![query path](../imgs/9-40_query-path.png)
 
 1. SQL is mapped to relational algebra
 2. relational algebra expressions are optimised
