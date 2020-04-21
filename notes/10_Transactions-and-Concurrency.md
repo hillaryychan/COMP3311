@@ -22,7 +22,7 @@ A **transaction** is an atomic "unit of work" in an application which may requir
 
 Transactions happen in a multi-user, unreliable environment.
 
-To maintain integrity of data, transactions must be
+To maintain integrity of data, transactions must be **ACID**;
 
 * **Atomic** - either fully complete or totally rolled-back
 * **Consistent** - map the database between consistent states
@@ -104,7 +104,7 @@ A **schedule** defines a specific execution of one or more transactions. They ar
 
 Arbitrary interleaving of operations cause **anomalies**, so that two consistency-preserving transactions produce a final state which is not consistent
 
-### Serial Schedules
+### Schedules
 
 **Serial** execution: `T1` then `T2` or `T2` then `T1`
 
@@ -120,8 +120,6 @@ Serial execution guarantees a consistent final state if
 
 * the initial state of the database is consistent
 * T1 and T2 are consistency-preserving
-
-### Concurrent Schedules
 
 **Concurrent** schedules interleave `T1`, `T2`,... operations
 
@@ -141,16 +139,35 @@ T2:      R(X)      W(X)
 
 We want the system to ensure that only valid schedules occur.
 
+Example of a concurrent schedule involving three transactions:
+
+``` txt
+T1: R(X)      W(X)      R(Y)                W(Y)
+T2:      R(Y)                W(Y)      R(X)
+T3:                R(X)           W(X)           W(Z)
+```
+
+Example of a _serial_ schedule involving three transactions:
+
+``` txt
+T1:                R(X) W(X) R(Y) W(Y)
+T2:                                    R(Y) W(Y) R(X)
+T3: R(X) W(X) W(Z)
+```
+
+Serial schedules (e..g T1 then T2 then T3) are _valid and safe_  
+Not all concurrent schedules are valid (e.g. the example above ins not safe)
+
 ### Serializability
 
-A **serializable** schedule is a concurrent schedule for T1 ..  Tn with the final state S, such that S is the also the final state of one of the possible serial schedules for T1 .. Tn
+A **serializable** schedule is a concurrent schedule for T1 ..  Tn with the final state S, such that S is the also the final state of one of the possible serial schedules for T1 .. Tn. Basically a concurrent schedule that is equivalent to a serial schedule
 
 Abstracting this needs a notion of **schedule equivalence**.
 
-There are two common formulations of _serializabliity_:
+There are two common formulations of _serializabiliity_:
 
 * **conflict serializability** (read/write operations occur in the "right" order)
-* **view serializablity** (read operations _see_ the correct version of data)
+* **view serializability** (read operations _see_ the correct version of data)
 
 #### Conflict Serializability
 
@@ -181,10 +198,8 @@ Example: transform a concurrent schedule to a serial schedule
 
 ![conflict serializable](../imgs/9-84_conflict-serializable.png)
 
-Checking for conflict serializability:  
-show that ordering in a concurrent schedule cannot be achieved in any serial schedule
-
-Method for doing this:
+To show conflict serializability we show that ordering in a concurrent schedule cannot be achieved in any serial schedule  
+Conflict serializability can also be tested via a **precedence graph**
 
 1. build a **precedence graph**
 2. nodes represent transactions
@@ -195,3 +210,89 @@ Method for doing this:
 Example: build a precedence graph for the following schedule
 
 ![precedence graph](../imgs/9-86_precedence-graph.png)
+
+Example of a schedule which is not conflict serializable:
+
+![non conflict serializable](../imgs/10-5_non-conflict-serializable.png)
+
+Precedence graph for the above schedule:
+
+![non conflict serializable precedence graph](../imgs/10-5_precedence-graph2.png)
+
+#### View Serializability
+
+**View serializability** is an alternative formulation of serializability that is **_less conservative/strict_** than conflict serializability. Some safe schedules that are view serializable are not conflict serializable. 
+
+As with conflict serializability, it is based on the notion of schedule equivalence. A schedule is "safe" if it is **_view equivalent_** to a serial schedule
+
+The idea is, if across the two schedules:
+
+* they read the same version of a shared object
+* they write the same final version of an object
+
+then there are **view equivalent**
+
+Two schedules S and S' on T1 .. Tn are _view equivalent_ iff for each shared data item X
+
+* if, in S, Tj reads the initial value of X,
+then, in S', Tj also reads the initial value of X
+* if, in S, Tj reads X written by Tk ,
+then, in S' Tj also reads the value of X written by Tk in S'
+* if, in S, Tj performs the final write of X,
+then, in S', Tj also performs the final write of X
+
+To check the serializability of S, find a serial schedule that is **_view equivalent_** toS from among `n!` possible serial schedules
+
+## Concurrency Control
+
+Serializability tests are useful theoretically, but they don't provide a mechanism for organising schedules. They can only be done after the event and are computationally every expensive; `O(n!)`
+
+What is required are methods that can be applied to each transaction individually and guarantee that the overall schedule is serializable
+
+Approaches to ensuring ACID transactions:
+
+* **lock-based** - synchronise transaction execution via locks on some portion of the database
+* **version-based** - allow multiple consistent versions of the data to exist, and allow each transaction exclusive access to one version
+* **timestamp-based** - organise transaction execution in advance by assigning timestamps to operations
+* **validation-based** (optimistic concurrency control) - exploit typical execution-sequence properties of transactions to determine safety dynamically
+
+### Lock-based Concurrency Control
+
+**Lock-based concurrency control** synchronises access to shared data items via the following rules:
+
+* before reading X, get shared (read) lock on X
+* before writing X, get exclusive (write) lock on X
+* an attempt to get a shared lock on x is blocked if another transaction already has exclusive lock on C
+* an attempt to get an exclusive lock on X is blocked if another transaction has **any** kind of lock on X
+
+These rules alone do not guarantee serializability but **two-phase locking** does. In this you acquire all needed locks before performing any unlocks.
+
+Locking also introduce potential for deadlock and starvation
+
+Examples of locking:
+
+``` txt
+Schedule 1
+T1: Lx(X)       R(X)           W(X) U(X)
+T2:       Lx(Y)      R(Y) W(Y)           U(Y)
+Schedule 2
+T1: Lx(X)       R(X) W(X) U(X)
+T2:       Lx(X) .............. R(X) W(X) U(X)
+```
+
+New operations: `Lx()` - exclusive lock, `Ls()` = shared lock, `U()` = unlock  
+Note: in schedule 2, locking forces serial execution. This is not generally the case; there may be some concurrency.
+
+In general, locking reduces concurrency, but gains safety.
+
+#### Locking Performance
+
+Locking reduces concurrency resulting in lower throughput.
+
+The **_granularity_** of locking can impact performance:  
++ lock a small item ⇒ more of database accessible  
++ lock a small item ⇒ quick update ⇒ quick lock release
+- lock small items ⇒ more locks ⇒ more lock management
+
+Granularity levels: field, row (tuples), table, whole database  
+Many DBMSs support multiple lock-granularities
