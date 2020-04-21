@@ -1,1 +1,197 @@
 # Transactions and Concurrency
+
+DBMSs provide valuable information resource in an environment that is:
+
+* **shares** - concurrent access by multiple users
+* **unstable** - potential for hardware/software failure
+
+Each user should see the system as:
+
+* **unshared** - their work in not inadvertently affected by others
+* **stable** - the data survives in the face of system failures
+
+The ultimate goal is that **_data integrity is maintained at all times_**
+
+**Transaction processing** is a technique for managing "logical units of work" which may require multiple database operations  
+**Concurrency control** techniques are for ensuring that multiple concurrent transactions do not interfere with each other  
+**Recovery mechanism** techniques are used to restore information to a consistent state, even after major hardware shutdown/failures
+
+## Transactions
+
+A **transaction** is an atomic "unit of work" in an application which may require multiple database changes.
+
+Transactions happen in a multi-user, unreliable environment.
+
+To maintain integrity of data, transactions must be
+
+* **Atomic** - either fully complete or totally rolled-back
+* **Consistent** - map the database between consistent states
+* **Isolated** - transactions do not interfere with each other
+* **Durable** - persistent, restorable after system failure
+
+An example transaction: a bank fund transfer  
+
+* move N dollars from account X to account Y
+* `Accounts(id,name,balance,heldAt,...)`
+* `Branches(id,name,address,assets,...)`
+* maintain `Branches.assets` as the sum of balances via triggers
+* transfer implemented by function which
+    * has three parameters: account, source account, destination account
+    * checks validity of supplied accounts
+    * checks sufficient available funds
+    * returns a unique transaction ID
+
+``` sql
+create or replace function transfer(N integer, Src text, Dest text) returns integer
+declare
+    sID integer;
+    dID integer;
+    avail integer;
+begin
+    select id,balance into sID,avail from Accounts where name=Src;
+    if (sID is null) then
+        raise exception 'Invalid source account %',Src;
+    end if;
+    select id into dID from Accounts where name=Dest;
+    if (dID is null) then
+        raise exception 'Invalid dest account %',Dest;
+    end if;
+    if (avail < N) then
+        raise exception 'Insufficient funds in %',Src;
+    end if;
+    -- total funds in system = NNNN
+    update Accounts set balance = balance-N where id = sID;
+    -- funds temporarily "lost" from system
+    update Accounts set balance = balance+N where id = dID;
+    -- funds restored to system; total funds = NNNN
+    return nextval('tx_id_seq');
+end;
+```
+
+### Transaction Concepts
+
+A transaction must always terminate either
+
+* **successfully** (`COMMIT`), with all changes preserved
+* **unsuccessfully** (`ABORT`), with database unchanged
+
+![transaction termination](../imgs/9-75_transaction-termination.png)
+
+To describe the transaction effects, we consider
+
+* `READ` - transfer data from disk to memory
+* `WRITE` -transfer data from memory to disk
+* `ABORT` - terminate transaction, unsuccessfully
+* `COMMIT` - terminate transaction, successfully
+
+Normally we abbreviate them to `R(X)`, `W(X)`, `A`, `C`
+
+* `SELECT` produces `READ` operations on the database
+* `INSERT` produces `WRITE` operations
+* `UPDATE`, `DELETE` produce both `READ` and `WRITE` operations
+
+### Transaction Consistency
+
+Transactions typically have intermediate states that are invalid. However, states **before** and **after** a transaction must be valid.
+
+![transaction consistency](../imgs/9-77_transaction-consistency)
+
+Reminder: valid = consistent = satisfying all state constraints on the data
+
+Transaction descriptions can be abstracted. Consider only `READ` and `WRITE` operations on shared data; e.g. T1: R(X) W(X) R(Y) W(Y), T2: R(X) R(Y) W(X) W(Y)
+
+A **schedule** defines a specific execution of one or more transactions. They are typically concurrent, with interleaved operations
+
+Arbitrary interleaving of operations cause **anomalies**, so that two consistency-preserving transactions produce a final state which is not consistent
+
+### Serial Schedules
+
+**Serial** execution: `T1` then `T2` or `T2` then `T1`
+
+``` txt
+T1: R(X) W(X) R(Y) W(Y)
+T2:                     R(X) W(X)
+or
+T1:           R(X) W(X) R(Y) W(Y)
+T2: R(X) W(X)
+```
+
+Serial execution guarantees a consistent final state if
+
+* the initial state of the database is consistent
+* T1 and T2 are consistency-preserving
+
+### Concurrent Schedules
+
+**Concurrent** schedules interleave `T1`, `T2`,... operations
+
+Some concurrent schedules are ok e.g.
+
+``` txt
+T1: R(X) W(X)      R(Y)      W(Y)
+T2:           R(X)      W(X)
+```
+
+Other concurrent schedules cause anomalies e.g.
+
+``` txt
+T1: R(X)      W(X)      R(Y) W(Y)
+T2:      R(X)      W(X)
+```
+
+We want the system to ensure that only valid schedules occur.
+
+### Serializability
+
+A **serializable** schedule is a concurrent schedule for T1 ..  Tn with the final state S, such that S is the also the final state of one of the possible serial schedules for T1 .. Tn
+
+Abstracting this needs a notion of **schedule equivalence**.
+
+There are two common formulations of _serializabliity_:
+
+* **conflict serializability** (read/write operations occur in the "right" order)
+* **view serializablity** (read operations _see_ the correct version of data)
+
+#### Conflict Serializability
+
+Consider two transactions T1 and T2 acting on data item X.  
+The possible order for read/write operations by T1 and T2
+
+| T1 first    | T2 first    | Equivalent? |
+| ---         | ---         | ---         |
+| R1(X) R2(X) | R2(X) R1(X) | yes         |
+| R1(X) W2(X) | W2(X) R1(X) | no          |
+| W1(X) R2(X) | R2(X) W1(X) | no          |
+| W1(X) W2(X) | W2(X) W1(X) | no          |
+
+If T1 and T2 act on different data items, the result is **always** equivalent
+
+Two transactions have a potential **_conflict_** if
+
+* they perform operations on the **same data item**
+* at least one of the operations is a **write operation**
+
+In such cases, the order of operations affects the result.
+
+If there is no conflict, we can swap the order without affecting the result
+
+If we can transform a schedule by swapping the order of non-conflicting operations such that the result is a serial schedule then we say that the schedule is **conflict serializable**
+
+Example: transform a concurrent schedule to a serial schedule
+
+![conflict serializable](../imgs/9-84_conflict-serializable.png)
+
+Checking for conflict serializability:  
+show that ordering in a concurrent schedule cannot be achieved in any serial schedule
+
+Method for doing this:
+
+1. build a **precedence graph**
+2. nodes represent transactions
+3. arcs represent order of action on shared data
+4. arc from T1 → T2 means T1 acts on X before T2
+5. cycles indicate **not** conflict serializable
+
+Example: build a precedence graph for the following schedule
+
+![precedence graph](../imgs/9-86_precedence-graph.png)
