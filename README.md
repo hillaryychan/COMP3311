@@ -13,3 +13,4 @@
 7. [Relational Design Theory](https://github.com/hillaryychan/COMP3311/blob/master/notes/07_Relational-Design-Theory.md)
 8. [Relational Algebra](https://github.com/hillaryychan/COMP3311/blob/master/notes/08_Relational-Algebra.md)
 9. [DBMS Architecture](https://github.com/hillaryychan/COMP3311/blob/master/notes/09_DBMS-Architecture.md)
+10. [Transactions and Concurrency](https://github.com/hillaryychan/COMP3311/blob/master/notes/10_Transactions-and-Concurrency.md)
