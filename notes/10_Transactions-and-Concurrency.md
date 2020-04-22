@@ -98,7 +98,8 @@ Transactions typically have intermediate states that are invalid. However, state
 
 Reminder: valid = consistent = satisfying all state constraints on the data
 
-Transaction descriptions can be abstracted. Consider only `READ` and `WRITE` operations on shared data; e.g. T1: R(X) W(X) R(Y) W(Y), T2: R(X) R(Y) W(X) W(Y)
+Transaction descriptions can be abstracted.  
+Consider only `READ` and `WRITE` operations on shared data; e.g. T1: R(X) W(X) R(Y) W(Y), T2: R(X) R(Y) W(X) W(Y)
 
 A **schedule** defines a specific execution of one or more transactions. They are typically concurrent, with interleaved operations
 
@@ -290,9 +291,9 @@ In general, locking reduces concurrency, but gains safety.
 Locking reduces concurrency resulting in lower throughput.
 
 The **_granularity_** of locking can impact performance:  
-+ lock a small item ⇒ more of database accessible  
-+ lock a small item ⇒ quick update ⇒ quick lock release
-- lock small items ⇒ more locks ⇒ more lock management
+\+ lock a small item ⇒ more of database accessible  
+\+ lock a small item ⇒ quick update ⇒ quick lock release  
+\- lock small items ⇒ more locks ⇒ more lock management
 
 Granularity levels: field, row (tuples), table, whole database  
 Many DBMSs support multiple lock-granularities
