@@ -291,9 +291,9 @@ In general, locking reduces concurrency, but gains safety.
 Locking reduces concurrency resulting in lower throughput.
 
 The **_granularity_** of locking can impact performance:  
-\+ lock a small item ⇒ more of database accessible  
-\+ lock a small item ⇒ quick update ⇒ quick lock release  
-\- lock small items ⇒ more locks ⇒ more lock management
+**+** lock a small item ⇒ more of database accessible  
+**+** lock a small item ⇒ quick update ⇒ quick lock release  
+**-** lock small items ⇒ more locks ⇒ more lock management
 
 Granularity levels: field, row (tuples), table, whole database  
 Many DBMSs support multiple lock-granularities
