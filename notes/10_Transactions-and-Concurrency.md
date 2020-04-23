@@ -222,7 +222,7 @@ Precedence graph for the above schedule:
 
 #### View Serializability
 
-**View serializability** is an alternative formulation of serializability that is **_less conservative/strict_** than conflict serializability. Some safe schedules that are view serializable are not conflict serializable. 
+**View serializability** is an alternative formulation of serializability that is **_less conservative/strict_** than conflict serializability. Some safe schedules that are view serializable are not conflict serializable.
 
 As with conflict serializability, it is based on the notion of schedule equivalence. A schedule is "safe" if it is **_view equivalent_** to a serial schedule
 
@@ -290,7 +290,8 @@ In general, locking reduces concurrency, but gains safety.
 
 Locking reduces concurrency resulting in lower throughput.
 
-The **_granularity_** of locking can impact performance:  
+The **_granularity_** of locking can impact performance:
+
 **+** lock a small item ⇒ more of database accessible  
 **+** lock a small item ⇒ quick update ⇒ quick lock release  
 **-** lock small items ⇒ more locks ⇒ more lock management

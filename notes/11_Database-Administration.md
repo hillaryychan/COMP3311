@@ -136,7 +136,7 @@ FROM (ListOfRoles | PUBLIC)
 CASCADE | RESTRICT
 
 -- This normally withdraws `Privileges` from just specified users/roles.
--- CASCADE also withdraws from users they had granted to 
+-- CASCADE also withdraws from users they had granted to
 -- e.g. revoking from U1 also revokes U5 and U6
 -- RESTRICT fails if users granted privileges to others
 -- e.g. revoking form U1 fails, revoking U5 or U2 succeeds
