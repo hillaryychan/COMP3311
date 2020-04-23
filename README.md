@@ -15,5 +15,4 @@
 9. [DBMS Architecture](https://github.com/hillaryychan/COMP3311/blob/master/notes/09_DBMS-Architecture.md)
 10. [Transactions and Concurrency](https://github.com/hillaryychan/COMP3311/blob/master/notes/10_Transactions-and-Concurrency.md)
 11. [Database Administration](https://github.com/hillaryychan/COMP3311/blob/master/notes/11_Database-Administration.md) (Security, Privilege, Authorisation)
-
-
+12. [Database:Past, Present, Future](https://github.com/hillaryychan/COMP3311/blob/master/notes/12_Databases:Past-Present-Future.md)
