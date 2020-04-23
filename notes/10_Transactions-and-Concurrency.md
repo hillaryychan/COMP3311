@@ -297,3 +297,54 @@ The **_granularity_** of locking can impact performance:
 
 Granularity levels: field, row (tuples), table, whole database  
 Many DBMSs support multiple lock-granularities
+
+### Multi-version Concurrency Control
+
+One approach to reducing the requirement for locks is to provide multiple (consistent) versions of the database. We give each transaction access to an "appropriate" version (i.e. a version that maintains the serializability of the transaction).
+
+This approach is called **multi-version concurreny control (MVCC)**
+
+Difference between MVCC and standard locking models:
+
+* writing never blocks reading (make new versions of tuple)
+* reading never blocks writing (read old version of tuple)
+
+PostgreSQL pioneered MVCC as a concurrency control mechanism.
+
+In PostgreSQL MVCC:
+
+* each tuple is tagged with the (time of) transaction that created/deleted it
+* each tuple is linked to the next newer version of the same tuple
+
+Access to a tuple requires checking the most recent version which existed when the transaction started; we use that version
+
+A periodic `vaccum` process deletes tuples that are not accessible to any currently executing transaction.
+
+Time/space overheads in implementing MVCC are justified by reduced requirement for locking (⇒ more concurrency)
+
+### Concurrency Control in SQL
+
+Transactions in SQL are specified by:
+
+* `BEGIN` to start a transaction
+* `COMMIT` to successfully complete a transaction
+* `ROLLBACK` to undo changes made by a transaction and abort
+
+In PostgreSQL, other actions that cause rollback:
+
+* **raise exception** during the execution of a function
+* returning `NULL` from a **before** trigger
+
+Concurrent access can be controlled via SQL:
+
+* table-level locking: applying lock to entire table
+* row-level locking: applying lock to just some rows
+
+`LOCK TABLE` explicitly acquires the lock on an entire table.
+
+Other SQL commands implicitly acquire locks e.g.
+
+* `ALTER TABLE` acquires an exclusive lock on a table
+* `UPDATE`, `DELETE` acquire locks on affected rows
+
+All locks are released at the end of transactions (with no explicit unlock)
