@@ -209,7 +209,7 @@ draw an arc for transaction 1 to transaction 2 if
     1. `R1(X)` before `W2(X)`
     2. `W1(X)` before `R2(X)`
     3. `W1(X)` before `W2(X)`
-Note that we ignore `R1(X)` before `R2(X)`
+    Note that we ignore `R1(X)` before `R2(X)`
 4. arc from T1 → T2 means T1 acts on X before T2
 5. cycles indicate **not** conflict serializable
 
