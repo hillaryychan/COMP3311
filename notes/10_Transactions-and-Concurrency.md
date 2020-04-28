@@ -227,7 +227,7 @@ Precedence graph for the above schedule:
 
 #### View Serializability
 
-**View serializability** is an alternative formulation of serializability that is **_less conservative/strict_** than conflict serializability. Some safe schedules that are view serializable are not conflict serializable.
+**View serializability** is an alternative formulation of serializability that is **_less conservative/strict_** than conflict serializability. Some safe schedules that are view serializable are not conflict serializable. **If a schedule is conflict-serializable, it must also be view serializable.**
 
 As with conflict serializability, it is based on the notion of schedule equivalence. A schedule is "safe" if it is **_view equivalent_** to a serial schedule
 
