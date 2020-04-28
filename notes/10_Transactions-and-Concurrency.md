@@ -240,11 +240,11 @@ then there are **view equivalent**
 
 Two schedules S and S' on T1 .. Tn are _view equivalent_ iff for each shared data item X
 
-* if, in S, Tj reads the initial value of X,
+* if, in S, Tj reads the initial value of X,  
 then, in S', Tj also reads the initial value of X
-* if, in S, Tj reads X written by Tk ,
+* if, in S, Tj reads X written by Tk ,  
 then, in S' Tj also reads the value of X written by Tk in S'
-* if, in S, Tj performs the final write of X,
+* if, in S, Tj performs the final write of X,  
 then, in S', Tj also performs the final write of X
 
 To check the serializability of S, find a serial schedule that is **_view equivalent_** toS from among `n!` possible serial schedules
