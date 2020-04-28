@@ -204,12 +204,12 @@ Conflict serializability can also be tested via a **precedence graph**
 
 1. build a **precedence graph**
 2. nodes represent transactions
-3. arcs represent order of action on shared data
+3. arcs represent order of action on shared data  
 draw an arc for transaction 1 to transaction 2 if
     1. `R1(X)` before `W2(X)`
     2. `W1(X)` before `R2(X)`
-    3. `W1(X)` before `W2(X)`
-    Note that we ignore `R1(X)` before `R2(X)`
+    3. `W1(X)` before `W2(X)`  
+Note that we ignore `R1(X)` before `R2(X)`
 4. arc from T1 → T2 means T1 acts on X before T2
 5. cycles indicate **not** conflict serializable
 
@@ -238,14 +238,14 @@ The idea is, if across the two schedules:
 
 then there are **view equivalent**
 
-Two schedules S and S' on T1 .. Tn are _view equivalent_ iff for each shared data item X
+Two schedules S and S' on T1 .. Tn are _view equivalent_ iff **for each** shared data item X
 
-* if, in S, Tj reads the initial value of X,  
-then, in S', Tj also reads the initial value of X
-* if, in S, Tj reads X written by Tk ,  
-then, in S' Tj also reads the value of X written by Tk in S'
-* if, in S, Tj performs the final write of X,  
-then, in S', Tj also performs the final write of X
+* if, in S, Tj reads the initial value of X, then, in S', Tj also reads the initial value of X  
+(in both schedules the **_same transaction is the first to read_** the value of X)
+* if, in S, Tj reads X written by Tk , then, in S' Tj also reads the value of X written by Tk in S'  
+(both schedules interact with data items in the **_same order_**)
+* if, in S, Tj performs the final write of X, then, in S', Tj also performs the final write of X  
+(in both schedules the **_same transaction is the last to write_** the value of X)
 
 To check the serializability of S, find a serial schedule that is **_view equivalent_** toS from among `n!` possible serial schedules
 
