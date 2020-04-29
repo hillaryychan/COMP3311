@@ -336,7 +336,7 @@ A relation schema R is in BCNF w.r.t a set F of functional dependencies iff:
 For all functional dependencies X → Y in F+:
 
 * either X → Y is trivial (i.e. Y ⊂ X)
-* or X is a superkey (i.e. non-strict superset of attributes in key)
+* or X is a superkey (i.e. non-strict superset of attributes in key/ X contains the key)
 
 A database schema is in BCNF if all of its relation schemas are in BCNF.
 
@@ -421,7 +421,7 @@ A relation schema R is in 3NF w.r.t a set of F of functional dependencies iff:
 For all functional dependencies X → Y in F+:
 
 * either X → Y is trivial (i.e. Y ⊂ X)
-* or X is a superkey (i.e. non-strict superset of attributes in key)
+* or X is a superkey (i.e. non-strict superset of attributes in key/ X contains the key)
 * or Y is single attribute from a key
 
 A database schema is in 3NF if all relation schemas are in 3NF
