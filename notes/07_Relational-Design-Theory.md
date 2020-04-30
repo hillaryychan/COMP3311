@@ -422,7 +422,7 @@ For all functional dependencies X → Y in F+:
 
 * either X → Y is trivial (i.e. Y ⊂ X)
 * or X is a superkey (i.e. non-strict superset of attributes in key/ X contains the key)
-* or Y is single attribute from a key
+* or Y is single attribute from a candidate key
 
 A database schema is in 3NF if all relation schemas are in 3NF
 
