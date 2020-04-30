@@ -2,7 +2,7 @@
 
 DBMSs provide valuable information resource in an environment that is:
 
-* **shares** - concurrent access by multiple users
+* **shared** - concurrent access by multiple users
 * **unstable** - potential for hardware/software failure
 
 Each user should see the system as:
@@ -268,7 +268,7 @@ Approaches to ensuring ACID transactions:
 
 * before reading X, get shared (read) lock on X
 * before writing X, get exclusive (write) lock on X
-* an attempt to get a shared lock on x is blocked if another transaction already has exclusive lock on C
+* an attempt to get a shared lock on X is blocked if another transaction already has exclusive lock on X
 * an attempt to get an exclusive lock on X is blocked if another transaction has **any** kind of lock on X
 
 These rules alone do not guarantee serializability but **two-phase locking** does. In this you acquire all needed locks before performing any unlocks.
