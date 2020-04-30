@@ -211,7 +211,7 @@ Result = JohnBars interset GernotBars
 
 ## Difference
 
-**_Difference_** finds the set of tuples that exist in one relation but do not occur in a second **comptible** relation. It usees the same notion of relation compatibility as union.
+**_Difference_** finds the set of tuples that exist in one relation but do not occur in a second **comptible** relation. It uses the same notion of relation compatibility as union.
 
 `r1 - r2 = {t | t ∈ r1 ∧ ¬ t ∈ r2}`, where r1(R), r2(R)
 
@@ -254,8 +254,8 @@ Result = VBBars - NewBars
 Each tuple in the result contains all attribute from r and s, possible with some fields renames to avoid ambiguity.  
 If `t1 = (A1...An )` and `t2 = (B1 ...Bn)` then` (t1:t2) = (A1...An,B1...Bn)`  
 
-Result size: `|r × s| = |r|.|s|`
-Result Schema: `R ∪ S`
+Result size: `|r × s| = |r|.|s|`  
+Result Schema: `R ∪ S`  
 Algorithmic view:
 
 ``` sql
@@ -275,7 +275,7 @@ Example of product:
 
 Consider relation schema R(ABC..JKLM), S(KLMN..XYZ).  
 The natural join of relations r(R) and s(S) is defined as:  
-`r ⋈ s = r Join s = {(t1[ABC..J] : t2[K..XYZ]) | t1 ∈ r ∧ t2 ∈ s ∧ match }`,
+`r ⋈ s = r Join s = {(t1[ABC..J] : t2[K..XYZ]) | t1 ∈ r ∧ t2 ∈ s ∧ match }`,  
 where `match = t1[K] = t2[K] ∧ t1[L] = t2[L] ∧ t1[M] = t2[M]`
 
 Algorithmic view:
@@ -294,7 +294,7 @@ Example of natural join
 
 **_Theta join_** is a specialised product containing only pairs that match on a supplied condition C
 
-`r ⋈ C s = {(t1:t2 ) | t1 ∈ r ∧ t2 ∈ s ∧ C(t1:t2 )}`, where r(R),s(S)
+`r ⋈C s = {(t1:t2 ) | t1 ∈ r ∧ t2 ∈ s ∧ C(t1:t2 )}`, where r(R),s(S)
 
 All attribute names are required to be **distinct**
 
