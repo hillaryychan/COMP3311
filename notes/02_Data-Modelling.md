@@ -362,9 +362,9 @@ A one-to-many relationship can be mapped by having more values in one entity ~~o
 
 **Be wary about the correctness of your mappings.**
 
-For the first method, if we made branch store `customerNo` and `joined`, since each customer has one branch, the same branch will appear multiple times, violating the primary key.we cannot guarantee that we represented total participation on the customer entity.
+For the first method, if we made branch store `customerNo` and `joined`, since each customer has one branch, the same branch will appear multiple times, violating the primary key. We cannot guarantee that we represented total participation on the customer entity.
 
-The second method is incorrect because when using a new relation to represent the relationship, we a are no longer able represent the cardinality of the relationship properly; the customer can have more than one branch (by appearing in multiple tuples) when it is only meant to have **one**
+The second method is incorrect because when using a new relation to represent the relationship, we are no longer able represent the cardinality of the relationship properly; the customer can have more than one branch (by appearing in multiple tuples) when it is only meant to have **one**
 
 ### Mapping 1:1 Relationships
 
