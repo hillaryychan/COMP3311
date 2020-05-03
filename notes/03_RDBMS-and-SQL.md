@@ -114,22 +114,22 @@ Query languages are based on _relational algebra_
 
 ### Types/Constants in SQL
 
-Numeric types: `INTEGER`, `REAL`, `NUMERIC(w, d)`  
+**Numeric types**: `INTEGER`, `REAL`, `NUMERIC(w, d)`  
 e.g. `10`, `-1`, `3.14159`, `2e-5`, `6.022e23`
 
-String types: `CHAR(n)`, `VARCHAR(n)`, `TEXT`  
+**String types**: `CHAR(n)`, `VARCHAR(n)`, `TEXT`  
 e.g. `John`, `some text`, `!%#%!$`, `O''Brien`, `"`, `[A-Z]{4}\d{4}`, `a VeRy! Long String`  
 Note: the escape character in SQL is `'` hence the `''` in `O''Brien`
 
 PostgreSQL provides extended strings containing `\` escapes  
 e.g. `E'\n'`, `E'O\'Brien'`, `E'[A-Z]{4}\\d{4}'`, `E'John'`
 
-Typecasting is also allowed via; `expr::type` e.g. `'10'::integer`
+**Typecasting** is also allowed via; `expr::type` e.g. `'10'::integer`
 
-Logical types: `BOOLEAN`, `TRUE` and `FALSE` (or `true` and `false`)  
+**Logical types**: `BOOLEAN`, `TRUE` and `FALSE` (or `true` and `false`)  
 PostgreSQL also allows `t`, `true`, `yes`, `f`, `false`, `no`
 
-Time related types: `DATE`, `TIME`, `TIMESTAMP`, `INTERVAL`  
+**Time related types**: `DATE`, `TIME`, `TIMESTAMP`, `INTERVAL`  
 e.g. `2008-04-13`, `13:30:15`, `2004-10-19 10:23:54`, `Wed Dec 17 07:37:16 1997 PST`, `10 minutes`, `5 days, 6 hours, 15 seconds`  
 Subtraction of timestamps results in an interval. e.g. `now()::TIMESTAMP - birthdate::TIMESTAMP`
 
