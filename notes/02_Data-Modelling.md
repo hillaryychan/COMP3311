@@ -107,7 +107,7 @@ In some cases, a relationship needs associated attributes
 #### Weak Entity Sets
 
 A **weak entity** exists only because of an association with strong entities; it cannot exist without the strong entities it is associated with.  
-They do not have key of their own, but they do have a **descriminator** which is denoted using a dotted underline or the same symbol as a derived attributes. Weak entities are are always totally participant in a relationship.
+They do not have key of their own, but they do have a **descriminator** which is denoted using a dotted underline or the same symbol as a derived attributes. Weak entities are are always **totally participant** in a relationship.
 
 ![Weak entity](../imgs/1-48_weak-entity.png)
 
@@ -121,10 +121,10 @@ A **subclass** of an entity set A is a set of entities with
 Subclasses can be:
 
 * **overlapping** or **disjoint** (can an entity be in multiple subclasses?)  
-Overlapping inheritance: the entity can be this or that or both
+Overlapping inheritance: the entity can be this or that or both  
 Disjoint inheritance: the entity is must be one or the other but not both
 * **total** or **partial** (does every entity have to also be in a subclass?)  
-Partial participation does not have to be who inherits it.
+Partial participation does not have to be who inherits it.  
 Total participation means you cannot be the parent
 
 ![subclasses](../imgs/1-50_ER-subclasses.png)
