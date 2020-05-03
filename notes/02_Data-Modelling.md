@@ -262,8 +262,6 @@ Identifiers and reserved words are **case insensitive**; `TableName = tablename 
 **Types**: `integer`, `float`, `char(n)`, `varchar(n)`, `date`, etc.  
 **Operators**: `=`, `<>`, `<`, `<=`, `>`, `>=`, `AND`, `OR`, `NOT`, etc.
 
-Note: using double quotes `"` lets you make terms case-sensitive and name identifiers after reserved words.
-
 Sample SQL file representing multiple ways to define a schema:
 
 ``` sql
