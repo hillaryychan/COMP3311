@@ -252,7 +252,7 @@ Result = VBBars - NewBars
 `r × s = {(t1 : t2 ) | t1 ∈ r ∧ t2 ∈ s }`, where r(R), s(S)
 
 Each tuple in the result contains all attribute from r and s, possible with some fields renames to avoid ambiguity.  
-If `t1 = (A1...An )` and `t2 = (B1 ...Bn)` then` (t1:t2) = (A1...An,B1...Bn)`  
+If `t1 = (A1...An )` and `t2 = (B1 ...Bn)` then `(t1:t2) = (A1...An,B1...Bn)`
 
 Result size: `|r × s| = |r|.|s|`  
 Result Schema: `R ∪ S`  
